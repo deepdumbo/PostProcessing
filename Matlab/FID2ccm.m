@@ -7,6 +7,9 @@ function [im, W, F] = FID2ccm (mode)
 %        + phase comparison between Inati & Walsh       %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+close all;
+
 %% First add path of the necessary functions
 addpath('/home/kylianh/Dev/cute/MatlabSourceCode/CSM/');
 addpath('/home/kylianh/Dev/cute/bruker-to-ismrmrd-matlab');
@@ -21,7 +24,7 @@ if(strcmp(mode, 'Reco'))
 %% From hdf5 files already reconstructed with generic_create_dataset_from_bruker()
 elseif(strcmp(mode, 'h5'))
     disp('--> HDF5_KSPACE_READER');
-        data_for_acqp = hdf5_kspace_reader('/Dicom/DIXON/Validation/RecoData/test/',[27, 28, 29]);
+        data_for_acqp = hdf5_kspace_reader('/Dicom/DIXON/Validation/RecoData/test/',[23, 24, 25]);
     disp('<-- HDF5_KSPACE_READER');
 end
     

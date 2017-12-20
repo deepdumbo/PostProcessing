@@ -8,14 +8,17 @@
     
     filename = ['/home/', str_user, '/Dev/PostProcessing/Matlab/example.h5'];
         
+
         if exist(filename, 'file')
-            dset = ismrmrd.Dataset(filename, 'dataset');
+            dset = ismrmrd.Dataset(filename, 'dataset');      
         else
             error(['File ' filename ' does not exist.  Please generate it.'])
         end
 
 
         hdr = ismrmrd.xml.deserialize(dset.readxml);
+        
+        
 
         %% Encoding and reconstruction information
         % Matrix size
@@ -61,8 +64,6 @@
 
         D = dset.readAcquisition();
 
-
-
         %% Ignore noise scans
         % TODO add a pre-whitening example
         % Find the first non-noise scan
@@ -77,7 +78,7 @@
 
         meas  = D.select(firstScan:D.getNumber);
         clear D;
-
+       
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         contrast=1;
