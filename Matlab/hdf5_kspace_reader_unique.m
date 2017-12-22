@@ -6,7 +6,7 @@
 
     [ str_network_imagerie, str_network_perso ] = get_network_name( str_user );
     
-    filename = ['/home/', str_user, '/Dev/PostProcessing/Matlab/example.h5'];
+    filename = ['/home/', str_user, '/Dev/PostProcessing/Matlab/Synthetic_MRI/example.h5'];
         
 
         if exist(filename, 'file')

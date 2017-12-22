@@ -1,4 +1,4 @@
-function [kspace_data] = hdf5_kspace_reader(path, files)
+function [kspace_data, output_tmp] = hdf5_kspace_reader(path, files)
 
     [status,id]= system('whoami');
 
@@ -18,7 +18,7 @@ function [kspace_data] = hdf5_kspace_reader(path, files)
         
         if exist(filename, 'file')
             dset = ismrmrd.Dataset(filename, 'dataset');
-            fprintf('\t\t -- Echo %d : %s \n',ne, filename);
+            fprintf('\t\t -- Echo %d : %s \n',ne, filename); 
         else
             error(['File ' filename ' does not exist.  Please generate it.'])
         end
@@ -117,3 +117,5 @@ function [kspace_data] = hdf5_kspace_reader(path, files)
         kspace_data(:,:,:,ne)= mat.kspace.raw;
 
     end
+
+    output_tmp = ['/home/', str_user, path ,num2str(files(1)),'_',num2str(files(2)),'_',num2str(files(3))];

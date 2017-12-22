@@ -14,12 +14,12 @@ disp('--> GENERATE_NOISY_MULTICOILS_FLASH_SIMULATION');
         addpath('../../Matlab/CSM');
 
         %% Load session data
-        [status,id]= system('whoami');
+        [~,id]= system('whoami');
         str_user= id(1:end-1);
         %check_if_iam_using_the_ihuserver(str_user);
         %[ str_network_imagerie, str_network_perso ] = get_network_name( str_user );
         
-        clear status id
+        clear id
 
         %% Load the filename and data
         %filename = ['/home/', str_user, '/Dev/PostProcessing/Matlab/example.h5'];
@@ -114,6 +114,6 @@ disp('--> GENERATE_NOISY_MULTICOILS_FLASH_SIMULATION');
         disp('<-- DIXON_3P');
         
         %% Save data
-        clear acc_factor ans data i id img L_normal_7 L_broken_7 ne noise_color noise_white Rn_broken_7 Rn_normal_7 s S0_F S0_W sp x y z
-        save('Synthetic.mat');
+        clear acc_factor ans data i id img L_normal_7 L_broken_7 ne noise_color noise_white Rn_broken_7 Rn_normal_7 s S0_F S0_W x y z
+       % save('Synthetic.mat');
 disp('<-- GENERATE_NOISY_MULTICOILS_FLASH_SIMULATION');

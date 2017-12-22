@@ -11,9 +11,9 @@ function [im, W, F] = FID2ccm (mode)
 close all;
 
 %% First add path of the necessary functions
-addpath('/home/kylianh/Dev/cute/MatlabSourceCode/CSM/');
-addpath('/home/kylianh/Dev/cute/bruker-to-ismrmrd-matlab');
-addpath('/home/kylianh/Dev/cute/Imagine/code');
+addpath('CSM/');
+addpath('../bruker-to-ismrmrd-matlab');
+addpath('../Imagine/code');
 
 %% FID reconstruction
 if(strcmp(mode, 'Reco'))
@@ -24,7 +24,7 @@ if(strcmp(mode, 'Reco'))
 %% From hdf5 files already reconstructed with generic_create_dataset_from_bruker()
 elseif(strcmp(mode, 'h5'))
     disp('--> HDF5_KSPACE_READER');
-        data_for_acqp = hdf5_kspace_reader('/Dicom/DIXON/Validation/RecoData/test/',[23, 24, 25]);
+        [data_for_acqp, output_tmp] = hdf5_kspace_reader('/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20171221/3xFLASH/',[23, 24, 26]);
     disp('<-- HDF5_KSPACE_READER');
 end
     
@@ -38,14 +38,14 @@ disp('--> DIXON_COIL_COMBINE');
         im.inati = permute(im.inati, [1 2 4 3]);
         im.walsh = permute(im.walsh, [1 2 4 3]);
 
-        figure('name','Inati Reconstruction');
+        FRecoI = figure('name','Inati Reconstruction');
         for s=1:nechoes
             subplot(2,nechoes,s);           imagesc(abs(squeeze(im.inati(:,:,s)))); title(['Echo', num2str(s)]);  axis square;
             subplot(2,nechoes,s+nechoes);   imagesc(angle(squeeze(im.inati(:,:,s)))); axis square;
             colormap(gray);
         end
 
-        figure('name','Walsh Reconstruction');
+        FRecoW = figure('name','Walsh Reconstruction');
         for s=1:nechoes
             subplot(2,nechoes,s);           imagesc(abs(squeeze(im.walsh(:,:,s)))); title(['Echo', num2str(s)]);  axis square;
             subplot(2,nechoes,s+nechoes);   imagesc(angle(squeeze(im.walsh(:,:,s)))); axis square;
@@ -60,13 +60,25 @@ disp('--> DIXON_3P');
         [W.walsh, F.walsh, IP.walsh, OP.walsh] = Dixon_3P(im.walsh(:,:,1),im.walsh(:,:,2),im.walsh(:,:,3), 1);
 
     disp('    :: Water and Fat images');
-        figure('name','Dixon :: Inati Reconstruction');
+        FDixI = figure('name','Dixon :: Inati Reconstruction');
         subplot(121);   imagesc(abs(W.inati)); title('Water Only');   colorbar; axis square;
         subplot(122);   imagesc(abs(F.inati)); title('Fat Only');     colorbar; axis square;
         colormap(gray);
 
-        figure('name','Dixon :: Walsh Reconstruction');
+        FDixW = figure('name','Dixon :: Walsh Reconstruction');
         subplot(121);   imagesc(abs(W.walsh)); title('Water Only');   colorbar; axis square;
         subplot(122);   imagesc(abs(F.walsh)); title('Fat Only');     colorbar; axis square;
         colormap(gray);
 disp('<-- DIXON_3P');
+
+%% Save the .jpg
+% disp('--> SAVEFIGURE');
+%     disp(['    :: ', output_tmp, '_Inati.jpg']);
+%         saveFigure(FRecoI, [output_tmp,'_Inati.jpg']);
+%     disp(['    :: ', output_tmp, '_Walsh.jpg']);
+%         saveFigure(FRecoW, [output_tmp,'_Walsh.jpg']);
+%     disp(['    :: ', output_tmp, '_Inati_Dixon.jpg']);
+%         saveFigure(FDixI, [output_tmp,'_Inati_Dixon.jpg']);
+%     disp(['    :: ', output_tmp, '_Walsh_Dixon.jpg']);
+%         saveFigure(FDixW, [output_tmp,'_Walsh_Dixon.jpg']);
+% disp('<-- SAVEFIGURE');

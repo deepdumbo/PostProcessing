@@ -3,11 +3,13 @@
 
 %%
 %Load Data
-close all;
-clear all;
+%close all;
+%clear all;
 
-load im1.mat
-load smaps_phantom.mat
+%load im1.mat
+%load smaps_phantom.mat
+
+im1 = im.walsh(:,:,1);
 
 %Some settings
 acc_factor = 4;
