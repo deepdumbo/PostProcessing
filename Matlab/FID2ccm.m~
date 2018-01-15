@@ -13,7 +13,7 @@ close all;
 %% First add path of the necessary functions
 addpath('CSM/');
 addpath('../bruker-to-ismrmrd-matlab');
-addpath('Unwrap/quality/');
+addpath('../Imagine/code');
 
 %% FID reconstruction
 if(strcmp(mode, 'Reco'))
@@ -36,8 +36,14 @@ disp('--> DIXON_COIL_COMBINE');
         nechoes = 3;
         im = Dixon_coil_combine(data_for_acqp, nechoes, mode);
         im = permute(im, [1 2 4 3]);
-        ismrm_imshow(abs(im),[],[1 nechoes],{'Echo 1' 'Echo 2' 'Echo 3'}, 'Walsh Reconstruction : Magnitude');
-        ismrm_imshow(angle(im),[],[1 nechoes],{'Echo 1' 'Echo 2' 'Echo 3'}, 'Walsh Reconstruction : Phase');
+%         tmp = im(:,:,1);
+% clims = [0 max(abs(tmp(:)))];
+%         FRecoW = figure('name','Walsh Reconstruction');
+%         for s=1:nechoes
+%             subplot(2,nechoes,s);           imagesc(abs(squeeze(im(:,:,s))),clims); title(['Echo', num2str(s)]);  axis square;
+%             subplot(2,nechoes,s+nechoes);   imagesc(angle(squeeze(im(:,:,s)))); axis square;
+%             colormap(gray);
+%         end   
 disp('<-- DIXON_COIL_COMBINE');
 
 %% 3 points Dixon reconstruction
@@ -46,10 +52,11 @@ disp('--> DIXON_3P');
         [W, F] = Dixon_3P(im(:,:,1),im(:,:,2),im(:,:,3), 1);
 
     disp('    :: Water and Fat images');
-          shw(:,:,1) = W;
-          shw(:,:,2) = F;
-          FDixW = ismrm_imshow(abs(shw),[],[1 2],{'Water' 'Fat'}, 'Dixon :: Walsh Reconstruction');
-          clear shw;
+          FDixW = ismrm_imshow(phi_2,[],[1 1],[], '2phi unwrapped');
+%         FDixW = figure('name','Dixon :: Walsh Reconstruction');
+%         subplot(121);   imagesc(abs(W)); title('Water Only');   colorbar; axis square;
+%         subplot(122);   imagesc(abs(F)); title('Fat Only');     colorbar; axis square;
+%         colormap(gray);
 disp('<-- DIXON_3P');
 
 %% Save the .jpg

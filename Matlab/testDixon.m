@@ -1,24 +1,8 @@
-function [ W, F ] = Dixon_3P( S0, S1, S2, e )
-% This function aims to give a water/fat-only images with 3 points (echos)
-% with a phase encoding of the chemical shift as following (0, pi, 2pi).
-% Parameters :
-%   S0  : first echo at theta = 0
-%   S1  : second echo at theta = pi
-%   S2  : third echo at theta = 2pi
-%   W   : Water-only image
-%   F   : Fat-only image
-%   IP  : In-Phase image
-%   OP  : Out-of-Phase image
-%   e   : Amplitude loss error tolerated
+S0 = im(:,:,1);
+S1 = im(:,:,2);
+S2 = im(:,:,3);
 
-% BASED ON : Multipoint Dixon Technique for Water and Fat Proton and 
-% Susceptibility Imaging, Glover G. - J Magn Reson Imaging 1991;1:521?530.
-
-% AUTHOR : Kylian HALIOT, PhD - 16/10/2017
-
-%% Check arguments
-    narginchk( 3, nargin('Dixon_3P') ); 
-    
+close all; 
 %% We have basically 6 equations (3 magnitude and 3 phase) with a 7th that 
 %  constraints the others. And 5 unknowns (W, F, phi0, phi and A):
 %  - phi = phase accumulated because of the B0 inhomogeneity during the
@@ -57,10 +41,8 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, e )
     % Get phi
     phi_2 = angle( S2_ );
     %phi_2 = GoldsteinUnwrap2D_r1(abs(S2_),angle(S2_));
-    %phi_2 = QualityGuidedUnwrap2D_r1(abs(S2_),angle(S2_));
+   %phi_2 = QualityGuidedUnwrap2D_r1(abs(S2_),angle(S2_));
     phi   = phi_2 / 2;
-    
-    %ismrm_imshow(phi_2,[],[1 1],[], '2phi unwrapped');
     
     % Initialize A
     A = sqrt( abs( S2 ) ./ S0_ );
@@ -77,7 +59,23 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, e )
     % Get W and F images
     W = (S0_ + (pc.*abs(S1))./ A) ./ 2;
     F = (S0_ - (pc.*abs(S1))./ A) ./ 2;
+    
 
-
-end
-
+% figure, colormap(gray(256))
+% imagesc(angle(S2)); 
+% xlabel('Pixels'), ylabel('Pixels')
+% title('Unwrapped phase image using the 2D-SRNCP algorithm')
+% figure 
+% surf(double(angle(S2)),'FaceColor','interp', 'EdgeColor','none', 'FaceLighting','phong')
+% view(-30,30), camlight left, axis tight, title('Unwrapped phase image using the 2D-SRNCP displayed as a surface')
+% xlabel('Pixels'), ylabel('Pixels'), zlabel('Phase in radians')
+     
+     % Plot reconstructed images
+%      ismrm_imshow(abs(im),[],[1 3],{'echo 1','echo 2','echo 3'}, 'Mag - Wrapped');
+%      ismrm_imshow(angle(im),[],[1 3],{'echo 1','echo 2','echo 3'}, 'Phase - Wrapped');
+     ismrm_imshow(phi_2,[],[1 1],[], '2phi unwrapped');
+     
+     % Plot Dixon
+     Dix(:,:,1) = W;
+     Dix(:,:,2) = F;
+     ismrm_imshow(abs(Dix),[],[1 2],{'Water','Fat'}, 'Dixon - Wrapped');

@@ -52,8 +52,11 @@ check_if_iam_using_the_ihuserver(str_user);
 % acquisition_path='/home/valery/Reseau/Imagerie/Auckland/Sheep/Control/2015_12_13_Heart_4/31/';
 % acquisition_path='/home/valery/Reseau/Imagerie/Auckland/Kadence/Control/2016_05_03_Heart_2/17/';
 
-acquisition_path=['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20171221/3xFLASH/26'];
-output_tmp = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20171221/3xFLASH/26'];
+% acquisition_path=['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20171221/Dixon/24'];
+% output_tmp = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20171221/Dixon/24'];
+ acquisition_path=['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20171221/Dixon/13'];
+ output_tmp = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20171221/Dixon/13'];
+
 output_filename = [output_tmp,'.h5'];
 
 

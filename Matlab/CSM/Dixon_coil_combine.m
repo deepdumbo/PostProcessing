@@ -1,4 +1,4 @@
-function [ im_inati, im_walsh ] = Dixon_coil_combine( data_for_acqp, nechoes, mode)
+function [im_walsh ] = Dixon_coil_combine( data_for_acqp, nechoes, mode)
 % This function aims to compare differents method of coils sensitivity
 % correlation
 % It therefore reconstructs the image data and merge all the coils images
@@ -44,19 +44,19 @@ for ne=1:nechoes
     
     % Coil sensibility map estimation
     csm_walsh(:,:,:,ne) = ismrm_estimate_csm_walsh(ifft_2D(data_pre_whitening_remove));
-    csm_inati(:,:,:,ne) = coil_map_study_2d_Inati( ifft_2D(data_pre_whitening_remove), 5, 3 );
+    %csm_inati(:,:,:,ne) = coil_map_study_2d_Inati( ifft_2D(data_pre_whitening_remove), 5, 3 );
     
     % Correct csm to fit the shading profile with a square root sum-of-square channel combination
     csm_walsh(:,:,:,ne) = ismrm_normalize_shading_to_sos(csm_walsh(:,:,:,ne));
-    csm_inati(:,:,:,ne) = ismrm_normalize_shading_to_sos(csm_inati(:,:,:,ne));
+    %csm_inati(:,:,:,ne) = ismrm_normalize_shading_to_sos(csm_inati(:,:,:,ne));
     
     % Computes noise-optimal channel combination maps from  coil sensitivity maps and a noise covariance matrix.
     ccm_walsh(:,:,:,ne) = ismrm_compute_ccm(csm_walsh(:,:,:,ne));
-    ccm_inati(:,:,:,ne) = ismrm_compute_ccm(csm_inati(:,:,:,ne));
+    %ccm_inati(:,:,:,ne) = ismrm_compute_ccm(csm_inati(:,:,:,ne));
 
     % Reconstruction of the images
     im_walsh(:,:,:,ne) = sum(ifft_2D(data_pre_whitening_remove) .* ccm_walsh(:,:,:,ne), 3);
-    im_inati(:,:,:,ne) = sum(ifft_2D(data_pre_whitening_remove) .* ccm_inati(:,:,:,ne), 3);
+    %im_inati(:,:,:,ne) = sum(ifft_2D(data_pre_whitening_remove) .* ccm_inati(:,:,:,ne), 3);
 
 %     figure(4)
 %     subplot(4,2,1);   imagesc(magnitudepre_whitening_remove); colormap(gray); title('standard'); axis square;
