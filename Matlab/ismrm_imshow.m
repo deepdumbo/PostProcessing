@@ -85,6 +85,7 @@ end
 
 figure_handle = figure;
 set(figure_handle,'Name',fig_title);
+set(figure_handle,'NumberTitle','off');
 set(figure_handle,'Units','Pixels');
 set(figure_handle,'Position',[0 0 frame_shape(2) frame_shape(1)+title_margin]);
 set(figure_handle,'Color',[1 1 1]);

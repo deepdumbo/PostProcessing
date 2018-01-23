@@ -1,4 +1,4 @@
-function [im, W, F] = FID2ccm (mode)
+function [im, Dixon, TE] = FID2ccm (mode)
 
 %%%%%        Routine script for reconstruction      %%%%%
 %%%%                                                 %%%%
@@ -24,7 +24,11 @@ if(strcmp(mode, 'Reco'))
 %% From hdf5 files already reconstructed with generic_create_dataset_from_bruker()
 elseif(strcmp(mode, 'h5'))
     disp('--> HDF5_KSPACE_READER');
-        [data_for_acqp, output_tmp] = hdf5_kspace_reader('/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20171221/3xFLASH/',[37, 40, 41]);
+        echoes  = [37:1:46];
+        TE0     = 2.8;
+        ES      = 0.35;
+        [data_for_acqp, output_tmp] = hdf5_kspace_reader('/Dicom/DIXON/Validation/RecoData/Dixon_t2star/Vivo/',echoes);
+        TE = [TE0:ES:(TE0+ES*(size(echoes,2)-1))]';
     disp('<-- HDF5_KSPACE_READER');
 end
     
@@ -33,29 +37,33 @@ disp('--> DIXON_COIL_COMBINE');
     disp('    :: Walsh reconstruction');
     
         % Number of echoes
-        nechoes = 3;
+        %nechoes = 3;
+        nechoes = size(TE,1);
         im = Dixon_coil_combine(data_for_acqp, nechoes, mode);
         im = permute(im, [1 2 4 3]);
-        ismrm_imshow(abs(im),[],[1 nechoes],{'Echo 1' 'Echo 2' 'Echo 3'}, 'Walsh Reconstruction : Magnitude');
-        ismrm_imshow(angle(im),[],[1 nechoes],{'Echo 1' 'Echo 2' 'Echo 3'}, 'Walsh Reconstruction : Phase');
+        im = circshift(im, 25, 2);
+        titles = cellstr(strcat('TE = ',num2str(TE,'%-.2f'), ' ms'));
+        FRecoWM = ismrm_imshow(abs(im),[],[1 nechoes],titles, 'Walsh Reconstruction : Magnitude');
+        FRecoWP = ismrm_imshow(angle(im),[],[1 nechoes],titles, 'Walsh Reconstruction : Phase');
 disp('<-- DIXON_COIL_COMBINE');
 
 %% 3 points Dixon reconstruction
 disp('--> DIXON_3P');
     disp('    :: Dixon processing');
-        [W, F] = Dixon_3P(im(:,:,1),im(:,:,2),im(:,:,3), 1);
+        [W, F] = Dixon_3P(im(:,:,1),im(:,:,2),im(:,:,3),TE);
 
     disp('    :: Water and Fat images');
-          shw(:,:,1) = W;
-          shw(:,:,2) = F;
-          FDixW = ismrm_imshow(abs(shw),[],[1 2],{'Water' 'Fat'}, 'Dixon :: Walsh Reconstruction');
-          clear shw;
+          Dixon(:,:,1) = W;
+          Dixon(:,:,2) = F;
+          FDixW = ismrm_imshow(abs(Dixon),[],[1 2],{'Water' 'Fat'}, 'Dixon :: Walsh Reconstruction');
 disp('<-- DIXON_3P');
 
-%% Save the .jpg
+% %% Save the .jpg
 % disp('--> SAVEFIGURE');
-%     disp(['    :: ', output_tmp, '_Walsh.jpg']);
-%         saveFigure(FRecoW, [output_tmp,'_Walsh.jpg']);
+%     disp(['    :: ', output_tmp, '_Mag_Walsh.jpg']);
+%         saveFigure(FRecoWM, [output_tmp,'_Mag_Walsh.jpg']);
+%     disp(['    :: ', output_tmp, '_Phase_Walsh.jpg']);
+%         saveFigure(FRecoWP, [output_tmp,'_Phase_Walsh.jpg']);
 %     disp(['    :: ', output_tmp, '_Walsh_Dixon.jpg']);
 %         saveFigure(FDixW, [output_tmp,'_Walsh_Dixon.jpg']);
 % disp('<-- SAVEFIGURE');

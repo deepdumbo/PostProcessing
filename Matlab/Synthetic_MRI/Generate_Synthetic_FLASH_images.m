@@ -3,21 +3,23 @@
 
 disp('--> GENERATE_SYNTHETIC_FLASH_IMAGES');
     disp('    :: Initialization');
+    
+    close all
     %% Initialization of the variables
     % ---------- Matrix ---------- %
     encX   = 200;
     encY   = 200;
     encZ   = 1;
-    ne     = 3;
+    ne     = 30;
 
     synFLASH = zeros(encX, encY, encZ, ne);
 
     % --------- Sequence ---------- %
-    TR     = 100  / 1000;   % ms
-    T1     = 2500 / 1000;   % ms
+    TR     = 100;   % ms
+    T1     = 2500;   % ms
     FA     = (acos(exp(-TR/T1))*180)/pi;  % °
-    TE     = 2.8  / 1000;   % ms
-    ES     = 3.15  / 1000;   % ms
+    TE     = 2.8;   % ms
+    ES     = 3.15;   % ms
 
     if(ne > 1)
         for i = 2:ne
@@ -25,11 +27,11 @@ disp('--> GENERATE_SYNTHETIC_FLASH_IMAGES');
         end
     end
 
-    T2e_W  = 50  / 1000;    % ms
-    T2e_F  = 110 / 1000;    % ms
+    T2e_W  = 17;    % ms
+    T2e_F  = 9;    % ms
 
-    S0_W   = 100;           % scaling factor for water signal
-    S0_F   = 50 ;           % scaling factor for fat signal
+    S0_W   = 10000;           % scaling factor for water signal
+    S0_F   = 8000 ;           % scaling factor for fat signal
 
     dF     = 1400;          % Hz
 
@@ -40,7 +42,7 @@ disp('--> GENERATE_SYNTHETIC_FLASH_IMAGES');
 
             % Water fraction
             for y = floor(encY/4):floor(3*encY/4)
-                for x = floor(encX/5):floor(2*encX/5)
+                for x = floor(encX/4):floor(2*encX/4)
 
                     synFLASH(x,y,z,i) = (S0_W * y * 2) * (((1-exp(-TR / T1)) / (1-cos(FA)*exp(-TR/T1))) * sin(FA)) * exp(-TE(i)/T2e_W);
 
@@ -49,9 +51,9 @@ disp('--> GENERATE_SYNTHETIC_FLASH_IMAGES');
     
             % Fat fraction
             for y = floor(encY/4):floor(3*encY/4)
-                for x = floor(3*encX/5):floor(4*encX/5)
+                for x = floor(2*encX/4 + 1):floor(3*encX/4)
 
-                    synFLASH(x,y,z,i) = (S0_F * y * 2) * (((1-exp(-TR / T1)) / (1-cos(FA)*exp(-TR/T1))) * sin(FA)) * exp(-TE(i)/T2e_F) * exp(1i*2*pi*dF*TE(i));
+                    synFLASH(x,y,z,i) = (S0_F * y * 2) * (((1-exp(-TR / T1)) / (1-cos(FA)*exp(-TR/T1))) * sin(FA)) * exp(-TE(i)/T2e_F) * exp(-1i*dF*TE(i));
 
                 end
             end
@@ -59,11 +61,9 @@ disp('--> GENERATE_SYNTHETIC_FLASH_IMAGES');
     end
 
 %% Display
-figure('name','Synthetic MRI :: No noise synthetic FLASH image');
-for s=1:ne
-    subplot(2,ne,s);        imagesc(abs(squeeze(synFLASH(:,:,s))));     axis square;    title(['Echo', num2str(s)]);  
-    subplot(2,ne,s+ne);     imagesc(angle(squeeze(synFLASH(:,:,s))));   axis square;
-    colormap(gray);
-end   
+addpath('../../ismrm_sunrise_matlab/');
+
+                ismrm_imshow(abs(squeeze(synFLASH)),[],[1 size(squeeze(synFLASH),3)],{});
+                ismrm_imshow(angle(squeeze(synFLASH)),[],[1 size(squeeze(synFLASH),3)],{});  
 
 disp('<-- GENERATE_SYNTHETIC_FLASH_IMAGES');

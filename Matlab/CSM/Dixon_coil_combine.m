@@ -1,4 +1,4 @@
-function [im_walsh ] = Dixon_coil_combine( data_for_acqp, nechoes, mode)
+function [im_walsh] = Dixon_coil_combine( data_for_acqp, nechoes, mode)
 % This function aims to compare differents method of coils sensitivity
 % correlation
 % It therefore reconstructs the image data and merge all the coils images

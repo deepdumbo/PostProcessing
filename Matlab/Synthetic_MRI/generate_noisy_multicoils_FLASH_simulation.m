@@ -10,15 +10,13 @@
 
 disp('--> GENERATE_NOISY_MULTICOILS_FLASH_SIMULATION');
     disp('    :: Dixon Fat/Water application');
-        addpath('../../Matlab/');
-        addpath('../../Matlab/CSM');
+        addpath('../');
+        addpath('../CSM');
+        addpath('../Unwrap/quality');
 
         %% Load session data
         [~,id]= system('whoami');
-        str_user= id(1:end-1);
-        %check_if_iam_using_the_ihuserver(str_user);
-        %[ str_network_imagerie, str_network_perso ] = get_network_name( str_user );
-        
+        str_user= id(1:end-1);       
         clear id
 
         %% Load the filename and data
@@ -72,45 +70,29 @@ disp('--> GENERATE_NOISY_MULTICOILS_FLASH_SIMULATION');
 
         %% Coils combination - Image reconstruction
         disp('--> DIXON_COIL_COMBINE');
-            disp('    :: Inati & Walsh reconstruction');
+            disp('    :: Walsh reconstruction');
 
                 % Number of echoes
-                nechoes = 3;
-                [im.inati, im.walsh] = Dixon_coil_combine(synData, nechoes, 'h5');
-                im.inati = permute(im.inati, [1 2 4 3]);
-                im.walsh = permute(im.walsh, [1 2 4 3]);
-
-                figure('name','Inati Reconstruction');
-                for s=1:nechoes
-                    subplot(2,nechoes,s);           imagesc(abs(squeeze(im.inati(:,:,s)))); title(['Echo', num2str(s)]);  axis square;
-                    subplot(2,nechoes,s+nechoes);   imagesc(angle(squeeze(im.inati(:,:,s)))); axis square;
-                    colormap(gray);
-                end
-
-                figure('name','Walsh Reconstruction');
-                for s=1:nechoes
-                    subplot(2,nechoes,s);           imagesc(abs(squeeze(im.walsh(:,:,s)))); title(['Echo', num2str(s)]);  axis square;
-                    subplot(2,nechoes,s+nechoes);   imagesc(angle(squeeze(im.walsh(:,:,s)))); axis square;
-                    colormap(gray);
-                end   
+                %nechoes = 3;
+                nechoes = size(TE,2);
+                im = Dixon_coil_combine(synData, nechoes, 'h5');
+                im = permute(im, [1 2 4 3]);
+                
+                titles = cellstr(strcat('TE = ',num2str(TE','%-.2f'), ' ms'));
+                ismrm_imshow(abs(im),[],[1 size(im,3)],titles);
+                ismrm_imshow(angle(im),[],[1 size(im,3)],titles);
         disp('<-- DIXON_COIL_COMBINE');
 
         %% 3 points Dixon reconstruction
         disp('--> DIXON_3P');
             disp('    :: Dixon processing');
-                [W.inati, F.inati, IP.inati, OP.inati] = Dixon_3P(im.inati(:,:,1),im.inati(:,:,2),im.inati(:,:,3), 1);
-                [W.walsh, F.walsh, IP.walsh, OP.walsh] = Dixon_3P(im.walsh(:,:,1),im.walsh(:,:,2),im.walsh(:,:,3), 1);
+                [W, F] = Dixon_3P(im(:,:,1),im(:,:,2),im(:,:,3),TE);
 
             disp('    :: Water and Fat images');
-                figure('name','Dixon :: Inati Reconstruction');
-                subplot(121);   imagesc(abs(W.inati)); title('Water Only');   colorbar; axis square;
-                subplot(122);   imagesc(abs(F.inati)); title('Fat Only');     colorbar; axis square;
-                colormap(gray);
-
-                figure('name','Dixon :: Walsh Reconstruction');
-                subplot(121);   imagesc(abs(W.walsh)); title('Water Only');   colorbar; axis square;
-                subplot(122);   imagesc(abs(F.walsh)); title('Fat Only');     colorbar; axis square;
-                colormap(gray);
+            clear Dixon
+                 Dixon(:,:,1) = W;
+                 Dixon(:,:,2) = F;
+                 ismrm_imshow(abs(Dixon),[],[1 2],{'Water' 'Fat'});
         disp('<-- DIXON_3P');
         
         %% Save data

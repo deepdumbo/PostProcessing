@@ -1,4 +1,4 @@
-function [ W, F ] = Dixon_3P( S0, S1, S2, e )
+function [ W, F ] = Dixon_3P( S0, S1, S2, TE)
 % This function aims to give a water/fat-only images with 3 points (echos)
 % with a phase encoding of the chemical shift as following (0, pi, 2pi).
 % Parameters :
@@ -7,9 +7,7 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, e )
 %   S2  : third echo at theta = 2pi
 %   W   : Water-only image
 %   F   : Fat-only image
-%   IP  : In-Phase image
-%   OP  : Out-of-Phase image
-%   e   : Amplitude loss error tolerated
+%   TE  : Echo times
 
 % BASED ON : Multipoint Dixon Technique for Water and Fat Proton and 
 % Susceptibility Imaging, Glover G. - J Magn Reson Imaging 1991;1:521?530.
@@ -17,7 +15,7 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, e )
 % AUTHOR : Kylian HALIOT, PhD - 16/10/2017
 
 %% Check arguments
-    narginchk( 3, nargin('Dixon_3P') ); 
+    narginchk( 4, nargin('Dixon_3P') ); 
     
 %% We have basically 6 equations (3 magnitude and 3 phase) with a 7th that 
 %  constraints the others. And 5 unknowns (W, F, phi0, phi and A):
@@ -55,12 +53,11 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, e )
 % in an in phase state for W and F. 
     
     % Get phi
-    phi_2 = angle( S2_ );
-    %phi_2 = GoldsteinUnwrap2D_r1(abs(S2_),angle(S2_));
-    %phi_2 = QualityGuidedUnwrap2D_r1(abs(S2_),angle(S2_));
-    phi   = phi_2 / 2;
+    % phi_2 = angle( S2_ );
+     phi_2 = QualityGuidedUnwrap2D_r1(abs(S2_),angle(S2_), 0.05);
+     phi   = phi_2 / 2;
     
-    %ismrm_imshow(phi_2,[],[1 1],[], '2phi unwrapped');
+    ismrm_imshow(phi_2,[],[1 1],[], '2phi unwrapped');
     
     % Initialize A
     A = sqrt( abs( S2 ) ./ S0_ );
@@ -71,9 +68,23 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, e )
 % F2 will be interverted. To avoid this we need to tell when W>F and when
 % W<F thanks to the phase as p = +1 for W>F and p = -1 for W<F but for
 % better results we will take it as a continuous way.
-    pc = cos(angle(S1_.*exp(-1i.*phi)));
-    %pc = real(S1_.*exp(-1i.*phi))./abs(S1_);
+hc = cos(angle(S1_.*exp(-1i.*phi)));
+pc = NaN(size(hc));
 
+for x = 1:size(hc, 2)
+    for y = 1:size(hc,1)
+        
+        if(0.5 <= hc(x,y) && hc(x,y) <= 1)
+            pc(x,y) = 1;
+        elseif ( -0.5 < hc(x,y) && hc(x,y) < 0.5)
+            pc(x,y) = 0;
+        elseif (-1 <= hc(x,y) && hc(x,y) <= -0.5)
+            pc(x,y) = -1;
+        end
+        
+    end
+end
+   
     % Get W and F images
     W = (S0_ + (pc.*abs(S1))./ A) ./ 2;
     F = (S0_ - (pc.*abs(S1))./ A) ./ 2;

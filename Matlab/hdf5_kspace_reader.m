@@ -118,4 +118,4 @@ function [kspace_data, output_tmp] = hdf5_kspace_reader(path, files)
 
     end
 
-    output_tmp = ['/home/', str_user, path ,num2str(files(1)),'_',num2str(files(2)),'_',num2str(files(3))];
+    output_tmp = ['/home/', str_user, path ,num2str(files(1)),'_to_',num2str(files(end))];
