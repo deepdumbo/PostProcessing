@@ -54,7 +54,7 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, TE)
     
     % Get phi
     % phi_2 = angle( S2_ );
-     phi_2 = QualityGuidedUnwrap2D_r1(abs(S2_),angle(S2_), 0.05);
+     phi_2 = QualityGuidedUnwrap2D_r1(abs(S2_),angle(S2_), 0.005);
      phi   = phi_2 / 2;
     
     ismrm_imshow(phi_2,[],[1 1],[], '2phi unwrapped');

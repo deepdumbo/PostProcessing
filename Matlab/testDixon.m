@@ -82,7 +82,7 @@ close all;
     
     % Get phi
      %phi_2 = angle( S2_ );
-    phi_2 = QualityGuidedUnwrap2D_r1(abs(S2_),angle(S2_),0.01);
+    phi_2 = QualityGuidedUnwrap2D_r1(abs(S2_),angle(S2_),0.005);
     phi   = phi_2 / 2;
     
     clear phases

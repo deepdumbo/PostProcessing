@@ -1,0 +1,45 @@
+% Calculate the fat percentage in a user-defined ROI for Dixon application
+
+function [PercentFat] = FatPercentage(im)
+    
+    % Works for 2D acquisitions
+    assert( size(im,3) > 2, '2-D image must have at least 3 echoes');
+
+    % Study only the abs()
+    absim = abs(im);
+    
+    % In-phase corrected acquisition
+    INCOR = ( absim(:,:,1) + absim(:,:,3) ) ./ 2;
+
+    PercentFat.Corrected_Fatmap = ((INCOR - absim(:,:,2))./INCOR)*100;
+
+    [PercentFat.masked_data, PercentFat.mask] = ROImask(PercentFat.Corrected_Fatmap, '% Fat');
+    
+    Per
+    PercentFat.MEAN  = mean(PercentFat.masked_data(:),'omitnan');
+    PercentFat.SD    = std(PercentFat.masked_data(:),'omitnan');
+    PercentFat.pixel = sum(PercentFat.mask(:) == 1);
+    
+    fprintf('');
+end
+
+
+function [masked_data, mask] = ROImask(im, name)
+        % Show the image of interest
+        image = abs(im);
+        RoiFig = figure('Name','Please draw a ROI...' , 'NumberTitle','off'); 
+        imagesc(image,[0 100]); title(upper(name)); colormap(gray); colorbar;   zoom off;
+        
+        % Draw the ROI 
+        mask = double(roipoly);
+        
+        close(RoiFig); 
+        
+        masked_data = apply_mask(image, mask);
+end
+
+function masked_data = apply_mask(image, mask)
+        
+        masked_data = mask .* image;
+        masked_data (mask == 0) = NaN;
+end
