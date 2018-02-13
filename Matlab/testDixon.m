@@ -28,24 +28,9 @@ close all;
     
     % Plot of the fit for water and fat
     pixel = 1;
-    Ffat = Fout.res(pixel,1) + Fout.res(pixel,2).*exp(-Fout.TE./Fout.res(pixel,3));
-    Fwat = Wout.res(pixel,1) + Wout.res(pixel,2).*exp(-Wout.TE./Wout.res(pixel,3));
-    figure('Name','Water and Fat : T_{2}^{*} fitting','NumberTitle','off');
-        subplot(211); 
-            plot(Fout.TE,Fout.S(:,pixel),'o'); 
-            hold on; 
-            plot(Fout.TE,Ffat); 
-            title(['Fat (T_{2}^{*} = ',num2str(Fout.res(pixel,3)),' ms)']);   
-            legend('Experimental points','F = x_0 + S\ite^{-TE / T_{2}^{*}}');
-            xlabel('TE (ms)');
-            ylabel('Signal magnitude');     
-        subplot(212); 
-            plot(Wout.TE,Wout.S(:,pixel),'o'); 
-            hold on; plot(Wout.TE,Fwat); 
-            title(['Water (T_{2}^{*} = ',num2str(Wout.res(pixel,3)),' ms)']); 
-            legend('Experimental points','F = x_0 + S\ite^{-TE / T_{2}^{*}}');
-            xlabel('TE (ms)');
-            ylabel('Signal magnitude');
+    TEc = linspace(0,TE(end),500); % Continuous TE for better plotting the fit
+    Ffat = Fout.res(pixel,1) + Fout.res(pixel,2).*exp(-TEc./Fout.res(pixel,3));
+    Fwat = Wout.res(pixel,1) + Wout.res(pixel,2).*exp(-TEc./Wout.res(pixel,3));
     
 %% We have basically 6 equations (3 magnitude and 3 phase)
 %  - phi = phase accumulated because of the B0 inhomogeneity during the
@@ -65,15 +50,21 @@ close all;
 %% 0. Keep only the first 3 TEs
     TE_  = TE(1:3);
     dTE = TE_(2) - TE_(1);
-    
+
+%% Other way to find W and F by saying R = -1/T2*
 %% 1. Remove phi0 from the equations
+    % Get Rw and Rf
+    Rw = -1 / wT2star;
+    Rf = -1 / fT2star;
+    
     % Get phi0
     phi0 = angle( S0 );
 
-    % Remove phi0 from the equations
-    S0_ = abs( S0 );
-    S1_ = S1 .* exp( -1i.*phi0 );
-    S2_ = S2 .* exp( -1i.*phi0 );
+    % Remove phi0 from the equations and Rw*t0 which is constant in all
+    % equations
+    S0_ = abs( S0 ) .* exp(-Rw*TE_(1));
+    S1_ = S1 .* exp( -1i.*phi0 ).* exp(-Rw*TE_(1)).*exp(-Rw*dTE);
+    S2_ = S2 .* exp( -1i.*phi0 ).* exp(-Rw*TE_(1)).*exp(-2*Rw*dTE);
     
 %% 2. Get phi and calculate W and F images
 % We're using 2phi from S2 instead of phi from S1 because S1 is in an
@@ -81,21 +72,13 @@ close all;
 % in an in phase state for W and F. 
     
     % Get phi
-     %phi_2 = angle( S2_ );
-    phi_2 = QualityGuidedUnwrap2D_r1(abs(S2_),angle(S2_),0.005);
-    phi   = phi_2 / 2;
+     tresh = 0.005; % Treshold for the noise
+     phi_2 = QualityGuidedUnwrap2D_r1(abs(S2_),wrap(angle(S2_),pi), tresh);
+     phi   = phi_2 / 2;
     
-    clear phases
-    phases(:,:,1) = angle(S2_);
-    phases(:,:,2) = phi_2;
-    ismrm_imshow(phases,[],[1 2],{'2\phi wrapped' '2\phi unwrapped'},'Phase unwrapping');
-    
-    % Initialize Tw and Tf
-    Tw0   = exp(((wT2star - fT2star) ./ (wT2star*fT2star)) .* TE_(1));
-    dTw   = exp(((wT2star - fT2star) ./ (wT2star*fT2star)) .* dTE  );
-    
-    Tf0   = exp(((fT2star - wT2star) ./ (wT2star*fT2star)) * TE_(1));
-    dTf   = exp(((fT2star - wT2star) ./ (wT2star*fT2star)) * dTE  );   
+    % Calculate A (which is a ratio between the 2 T2* factors)
+    A2 = exp(2*(Rf-Rw)*dTE);
+    A  = sqrt(A2);
 
 % If we reduce the 3PD to a 2PD we could get W2 = (abs(S0) + abs(S1))/2
 % and F2 = (abs(S0) - abs(S1))/2 and abs(S0)+abs(S1)> abs(S0)-abs(S1) then
@@ -122,21 +105,19 @@ end
 
 clear x y
 
-%     % Get W and F images according to a fatT2star factorisation
-    W = (((pc.*abs(S1)-abs(S2)).*exp(dTE/fT2star) + S0_.*(1+ exp(-dTE/fT2star))) ./  (Tf0.*(1 + dTf + (1 - dTf.^2).*exp(-dTE/fT2star)))) .* exp(TE_(1)./fT2star);
-            
-    F = (((pc.*abs(S1)-abs(S2)).*exp(dTE/fT2star) - S0_.*dTf.*(1 - dTf).*exp(-dTE/fT2star)) ./ (1 + dTf + (1 - dTf.^2).* exp(-dTE/fT2star)) ) .* exp(TE_(1)./fT2star);
+%% 3. Get rid of phi and Rw*dTE
+    S2__ = abs(S2_);
+    S1__ = abs(S1_);
 
-      % Get W and F images according to a fatT2star factorisation
-%       W = (((pc.*abs(S1)-abs(S2)).*exp(dTE/wT2star) + S0_.*dTw.*(1 + dTw.*exp(-dTE/wT2star))) ./ (1 + dTw + (dTw.^2 - 1).* exp(-dTE/wT2star)) ) .* exp(TE_(1)./wT2star);
-%       
-%       F = ((S0_.*(1 - exp(-dTE/wT2star)) - (pc.*abs(S1)-abs(S2)).*exp(dTE/wT2star)) ./  (Tw0.*(2 + (dTw - 1).*exp(-dTE/wT2star)))) .* exp(TE_(1)./wT2star);
+%% 4. Get W and F images
+    W = (S2__ + (A - A2).*S0_ + hc.*S1__) ./ (2 + A - A2);
+    F = (S2__ - hc.*S1__) ./ ((A2+A).*exp((Rf-Rw).*TE_(1)));
+
 
 %% SNR calculation
-     clear Dix diff shw
+     clear Dix shw
      Dix(:,:,1) = W;
      Dix(:,:,2) = F;
-     diff = abs(Dixon) - abs(Dix);
     
     SNR.im1     = SNR_ROI('Noise Area', im(:,:,1), Wout.fitmask);
     SNR.W       = SNR_ROI('',Dixon(:,:,1), Wout.fitmask, SNR.im1.noise.mask);
@@ -144,20 +125,47 @@ clear x y
     SNR.Wstar   = SNR_ROI('',Dix(:,:,1), Wout.fitmask, SNR.im1.noise.mask);
     SNR.Fstar   = SNR_ROI('',Dix(:,:,2), Fout.fitmask, SNR.im1.noise.mask);
     
-     
-     % Plot all methods (Dixon without and with T2* + diff)
-     
+
+    
+%% Plots
+     % Plot T2* fitting
+        figure('Name','Water and Fat : T_{2}^{*} fitting','NumberTitle','off');
+        subplot(211); 
+            plot(TE,Fout.SFull(:,pixel),'o'); 
+            hold on; 
+            plot(TEc,Ffat); 
+            title(['Fat (T_{2}^{*} = ',num2str(Fout.res(pixel,3)),' ms)']);   
+            legend('Experimental points','F = x_0 + S\ite^{-t / T_{2}^{*}}');
+            xlabel('t (ms)');
+            ylabel('Signal magnitude');     
+        subplot(212); 
+            plot(TE,Wout.SFull(:,pixel),'o'); 
+            hold on; 
+            plot(TEc,Fwat); 
+            title(['Water (T_{2}^{*} = ',num2str(Wout.res(pixel,3)),' ms)']); 
+            legend('Experimental points','F = x_0 + S\ite^{-t / T_{2}^{*}}');
+            xlabel('t (ms)');
+            ylabel('Signal magnitude');
+            
+    % Plot unwrapped phase
+    clear phases
+    phases(:,:,1) = angle(S2_);
+    phases(:,:,2) = phi_2;
+    ismrm_imshow(phases,[],[1 2],{'2\phi wrapped' '2\phi unwrapped'},'Phase unwrapping');
+    
+    % Plot hc and pc 
+    tt(:,:,1) = hc;
+    tt(:,:,2) = pc;
+    ismrm_imshow(tt,[],[1 2],{'hc' 'pc'},'Phase unwrapping');
+                     
+    % Plot all methods (Dixon without and with T2* + diff
      shw(:,:,1) = Dixon(:,:,1);
      shw(:,:,2) = Dix(:,:,1);
-     shw(:,:,3) = diff(:,:,1);
-     shw(:,:,4) = Dixon(:,:,2);
-     shw(:,:,5) = Dix(:,:,2);
-     shw(:,:,6) = diff(:,:,2);
+     shw(:,:,3) = Dixon(:,:,2);
+     shw(:,:,4) = Dix(:,:,2);
     
     titles = {['Water no T_{2}^{*} (SNR = ',num2str(SNR.W.val),')']  ...
               ['Water T_{2}^{*} (SNR = ',num2str(SNR.Wstar.val),')'] ...
-               'Diff Water'                                          ...
               ['Fat no T_{2}^{*} (SNR = ',num2str(SNR.F.val),')']    ...
-              ['Fat T_{2}^{*} (SNR = ',num2str(SNR.Fstar.val),')']   ...
-               'Diff Fat' };                                    
-    ismrm_imshow(abs(shw),[],[2 3],titles,'Comparison')
+              ['Fat T_{2}^{*} (SNR = ',num2str(SNR.Fstar.val),')']};                                    
+    ismrm_imshow(abs(shw),[],[2 2],titles,'Comparison')

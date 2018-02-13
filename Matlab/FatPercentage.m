@@ -1,4 +1,6 @@
 % Calculate the fat percentage in a user-defined ROI for Dixon application
+% The fat percentage in a ROI is directly corresponding to the mean of the
+% ROI data
 
 function [PercentFat] = FatPercentage(im)
     
@@ -22,7 +24,7 @@ function [PercentFat] = FatPercentage(im)
     PercentFat.pixel = sum(PercentFat.mask(:) == 1);
     
     disp('-------------------------------------');
-    fprintf('  Min/Max: %.2f/%.2f\n  Mean/SD: %.2f/%.2f\n  ROI: %d pixels\n\n  %%Fat: %.2f%%\n',PercentFat.min, PercentFat.max, PercentFat.MEAN, PercentFat.SD, PercentFat.pixel, PercentFat.MEAN*100);
+    fprintf('  Min/Max\t: %.2f/%.2f\n  Mean/SD\t: %.2f/%.2f\n  ROI\t\t: %d pixels\n  Fat(%%)\t: %.2f\n',PercentFat.min, PercentFat.max, PercentFat.MEAN, PercentFat.SD, PercentFat.pixel, PercentFat.MEAN*100);
     disp('-------------------------------------');
 end
 

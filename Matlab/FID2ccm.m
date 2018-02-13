@@ -15,6 +15,7 @@ addpath('CSM/');
 addpath('../bruker-to-ismrmrd-matlab');
 addpath('Unwrap/quality/');
 
+
 %% FID reconstruction
 if(strcmp(mode, 'Reco'))
     disp('--> GENERIC_CREATE_DATASET_FROM_BRUKER');
@@ -24,10 +25,10 @@ if(strcmp(mode, 'Reco'))
 %% From hdf5 files already reconstructed with generic_create_dataset_from_bruker()
 elseif(strcmp(mode, 'h5'))
     disp('--> HDF5_KSPACE_READER');
-        echoes  = [37:1:46];
-        TE0     = 2.8;
-        ES      = 0.35;
-        [data_for_acqp, output_tmp] = hdf5_kspace_reader('/Dicom/DIXON/Validation/RecoData/Dixon_t2star/Vivo/',echoes);
+        echoes  = [11:13];
+        TE0     = 2.64;
+        ES      = 0.33;
+        [data_for_acqp, output_tmp] = hdf5_kspace_reader('/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20180202/',echoes);
         TE = [TE0:ES:(TE0+ES*(size(echoes,2)-1))]';
     disp('<-- HDF5_KSPACE_READER');
 end
@@ -37,14 +38,13 @@ disp('--> DIXON_COIL_COMBINE');
     disp('    :: Walsh reconstruction');
     
         % Number of echoes
-        %nechoes = 3;
+        nshow = 3;
         nechoes = size(TE,1);
         im = Dixon_coil_combine(data_for_acqp, nechoes, mode);
         im = permute(im, [1 2 4 3]);
-        im = circshift(im, 25, 2);
-        titles = cellstr(strcat('TE = ',num2str(TE,'%-.2f'), ' ms'));
-        FRecoWM = ismrm_imshow(abs(im),[],[1 nechoes],titles, 'Walsh Reconstruction : Magnitude');
-        FRecoWP = ismrm_imshow(angle(im),[],[1 nechoes],titles, 'Walsh Reconstruction : Phase');
+        titles = cellstr(strcat('TE = ',num2str(TE(1:nshow,1),'%-.2f'), ' ms'));
+        FRecoWM = ismrm_imshow(abs(im(:,:,1:nshow)),[],[1 nshow],titles, 'Walsh Reconstruction : Magnitude');
+        FRecoWP = ismrm_imshow(angle(im(:,:,1:nshow)),[],[1 nshow],titles, 'Walsh Reconstruction : Phase');
 disp('<-- DIXON_COIL_COMBINE');
 
 %% 3 points Dixon reconstruction

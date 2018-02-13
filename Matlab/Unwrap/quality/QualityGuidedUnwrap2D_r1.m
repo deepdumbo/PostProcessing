@@ -45,8 +45,9 @@ im_phase_quality = PhaseDerivativeVariance_r1(im_phase.*im_mask);
 %% Automatically (default) or manually identify starting seed point on a phase quality map 
 minp = im_phase_quality(2:end-1, 2:end-1); minp = min(minp(:));
 maxp = im_phase_quality(2:end-1, 2:end-1); maxp = max(maxp(:));
-if(0)    % Chose starting point interactively
-  figure; imagesc(im_phase_quality,[minp maxp]), colormap(gray), colorbar, axis square, axis off; title('Phase quality map'); 
+if(1)    % Chose starting point interactively
+  f = figure('Name','Unwrap seed selection','Numbertitle','Off'); imagesc(im_phase_quality,[minp maxp]), colormap(gray), colorbar, axis square, axis off; title('Phase quality map'); 
+  set(0, 'currentfigure', f); % Make sure that the figure is current for using ginput
   uiwait(msgbox('Select known true phase reference phase point. Black = high quality phase; white = low quality phase.','Phase reference point','modal'));
   [xpoint,ypoint] = ginput(1);                %Select starting point for the guided floodfill algorithm
   colref = round(xpoint);
@@ -54,8 +55,8 @@ if(0)    % Chose starting point interactively
   close;  % close the figure;
 else   % Chose starting point = max. intensity, but avoid an edge pixel
   [rowrefn,colrefn] = find(im_mag(2:end-1, 2:end-1) >= 0.99*mag_max);
-  rowref = rowrefn(1)+1; % choose the 1st point for a reference (known good value)
-  colref = colrefn(1)+1; % choose the 1st point for a reference (known good value)
+  rowref = rowrefn(1)+1 % choose the 1st point for a reference (known good value)
+  colref = colrefn(1)+1 % choose the 1st point for a reference (known good value)
 end
 
 %% Unwrap

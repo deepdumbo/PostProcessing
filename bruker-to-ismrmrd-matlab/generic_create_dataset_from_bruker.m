@@ -1,7 +1,7 @@
 %% Read Bruker File
 
 %clear all
-close all
+%close all
 
 
 
@@ -40,29 +40,19 @@ check_if_iam_using_the_ihuserver(str_user);
 % * E76 2D partial fourier (matrix size 114*114) 
 % * E77 2D partial fourier (matrix size 99*100) 
 
-%% voici les reco qui ne fonctionne pas
-% *mp2rage
-
-% acquisition_path='/home/valery/DICOM/badres/4/'
-% acquisition_path='/home/valery/DICOM/Bruker_7617/11/';
-% acquisition_path='/home/valery/DICOM/tests13062017/80/';
-% acquisition_path='/home/valery/DICOM/tests13062017/74/';
-% acquisition_path='/home/valery/Reseau/Imagerie/Auckland/Sheep/Control/2014_04_10_Heart_1/77/';
-% acquisition_path='/home/valery/Reseau/Imagerie/Auckland/Kadence/Infarct/2015_12_16_Heart_3/31/';
-% acquisition_path='/home/valery/Reseau/Imagerie/Auckland/Sheep/Control/2015_12_13_Heart_4/31/';
-% acquisition_path='/home/valery/Reseau/Imagerie/Auckland/Kadence/Control/2016_05_03_Heart_2/17/';
-
 %% Boucle reco
 
-n_reco = [8];
+n_reco = [24];
 
 for numb = 1:size(n_reco,2)
     % acquisition_path=['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20171221/Dixon/24'];
     % output_tmp = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20171221/Dixon/24'];
     %  acquisition_path=['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20171221/Dixon/13'];
     %  output_tmp = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20171221/Dixon/13'];
-    acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20180122/Coeur_CC/',num2str(n_reco(numb))];
-    output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20180122/Coeur_CC/',num2str(n_reco(numb))];
+%     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20180202/',num2str(n_reco(numb))];
+%     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20180202/',num2str(n_reco(numb))];
+    acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20180202/',num2str(n_reco(numb))];
+    output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20180202/',num2str(n_reco(numb))];
 %     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20180122/',num2str(n_reco(numb))];
 %     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20180122/',num2str(n_reco(numb))];
 
@@ -102,7 +92,7 @@ for numb = 1:size(n_reco,2)
     number_of_channels=size(data_for_acqp,2);
     number_of_lines=size(data_for_acqp,3);
 
-
+    
 
     %% gestion de la diffusion
 
@@ -241,17 +231,32 @@ for numb = 1:size(n_reco,2)
         %         acqblock.head.flagSet('ACQ_LAST_IN_SLICE', acqno);
         %         acqblock.head.flagSet('ACQ_LAST_IN_REPETITION', acqno);
         %     end
-
-        % fill the data
-        acqblock.data{acqno} = squeeze(data_for_acqp(:,:,acqno));
-
     end
+   
+%      % Apply the offsets
+         ch = size(data_for_acqp, 2);
 
-    % Append the acquisition block
+        Offcenter = phaseOffsetCorrection(ex);
+            
+            data_for_acqp = permute(data_for_acqp,[3 1 2]);
+            tmp = data_for_acqp;
+        for ne=1:ex.method.PVM_NEchoImages
+             for k=1:ch
+                for jj=1:E1
+                        data_for_acqp(ne:ex.method.PVM_NEchoImages:end,jj,k)= tmp(ne:ex.method.PVM_NEchoImages:end,jj,k).*Offcenter(:,jj,:);
+                end
+             end
+        end
+            data_for_acqp = permute(data_for_acqp,[2 3 1]);
+         
+            
+   for acqno = 1:number_of_lines         
+         acqblock.data{acqno} = squeeze(data_for_acqp(:,:,acqno));
+   end
+        
+% Append the acquisition block
     dset.appendAcquisition(acqblock);
-
-
-
+    
     %%%%%%%%%%%%%%%%%%%%%%%%
     %% Fill the xml header %
     %%%%%%%%%%%%%%%%%%%%%%%%

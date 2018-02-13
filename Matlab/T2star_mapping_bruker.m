@@ -6,14 +6,15 @@ function out = T2star_mapping_bruker(im, TE, name)
     %% Initialization
         % Don't pick the first echo which is not in steady state yet
         %TE      = TE(2:end)';
-        TE      = TE(2:end)';
-        I       = abs(im(:,:,2:end));
+        TE      = TE(1:2:end)';
+        I       = abs(im(:,:,1:2:end)); % Use for the fit on In-phase state
+        Ifull   = abs(im); % Use for recovery all the echoes and for plotting against the fit curve
         image   = I(:,:,1);
 
     %% Création du masque - Mise en forme des data
         % Show the image of interest
         RoiFig = figure('Name','Please draw a ROI...' , 'NumberTitle','off'); 
-        imagesc(image); title(upper(name)); colormap(gray); colorbar;   zoom off;
+        imagesc(abs(im(:,:,1))); title(upper(name)); colormap(gray); colorbar;   zoom off;
 
         % Draw the ROI 
         fitmask_signal = double(roipoly);
@@ -24,7 +25,8 @@ function out = T2star_mapping_bruker(im, TE, name)
         % Close the fig
         close(RoiFig);
 
-        %S: vector of all pixels in the ROI during TE
+        %S: vector of all pixels in the ROI during 1 TE on 2 (Fit only the
+        %In-phase echoes)
         tmp = 0 ;
         S   = [];
         for k = 1:1:size(I,3)
@@ -33,6 +35,21 @@ function out = T2star_mapping_bruker(im, TE, name)
                         if (fitmask_signal(i,j) == 1) 
                             tmp     = tmp + 1 ;
                             S(k,tmp)= I(i,j,k); 
+                        end
+                end
+            end
+            tmp = 0;
+        end
+        
+        %Full: vector of all pixels in the ROI during TE
+        tmp        = 0 ;
+        FullData   = [];
+        for k = 1:1:size(Ifull,3)
+            for i = 1:1:size(Ifull,1)
+                for j = 1:1:size(Ifull,2)
+                        if (fitmask_signal(i,j) == 1) 
+                            tmp     = tmp + 1 ;
+                            FullData(k,tmp)= Ifull(i,j,k); 
                         end
                 end
             end
@@ -85,6 +102,7 @@ function out = T2star_mapping_bruker(im, TE, name)
         
         out.fitmap  = image_T2star;
         out.S       = S;
+        out.SFull   = FullData;
         out.res     = twoD_output_matrix;
         out.TE      = TE;
         out.fitmask = fitmask_signal;

@@ -1,0 +1,11 @@
+#ifndef MAIN_H
+#define MAIN_H
+
+#include <math.h>
+
+double RRG;
+double RRGDur;
+
+void Appel_Recursif(double, double, double, double, double, double, double*, double*, int);
+
+#endif
