@@ -55,9 +55,9 @@ check_if_iam_using_the_ihuserver(str_user);
 % acquisition_path='/home/valery/Reseau/Imagerie/Auckland/Kadence/Control/2016_05_03_Heart_2/17/';
 
 %output_filename = '/home/valery/DICOM/testdata.h5';
-acquisition_path=['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/22'];
-
-output_filename = ['/home/', str_user, '/Dicom/DIXON/slice.h5'];
+n_reco = [20];
+    acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Sheep_FAT/',num2str(n_reco)];
+    output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Sheep_FAT/',num2str(n_reco)];
 
 %% reading bruker acqp, method and fid files.
 

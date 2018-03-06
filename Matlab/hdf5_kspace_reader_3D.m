@@ -1,4 +1,4 @@
-function [kspace_data, output_tmp, TE] = hdf5_kspace_reader(path, files)
+function [kspace_data, output_tmp, TE] = hdf5_kspace_reader_3D(path, files)
 
     [status,id]= system('whoami');
 
@@ -90,32 +90,32 @@ function [kspace_data, output_tmp, TE] = hdf5_kspace_reader(path, files)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         contrast=1;
-        slice=1;
         rep=1;
+        slice=1;
+        
+            % donne le nombre de ligne correspondant à ces parametres
+            acqs_image = find(  (meas.head.idx.contrast==(contrast-1)) ...
+                & (meas.head.idx.repetition==(rep-1)) ...
+                & (meas.head.idx.slice==(slice-1))  );
 
-        % donne le nombre de ligne correspondant à ces parametres
-        acqs_image = find(  (meas.head.idx.contrast==(contrast-1)) ...
-            & (meas.head.idx.repetition==(rep-1)) ...
-            & (meas.head.idx.slice==(slice-1))  );
+            str_msg=sprintf('le nombre de lignes ACQ_IS_ ALL est  %d \n', size(acqs_image,2)); %disp(str_msg);
 
-        str_msg=sprintf('le nombre de lignes ACQ_IS_ ALL est  %d \n', size(acqs_image,2)); %disp(str_msg);
+            mat.kspace.raw = zeros(enc_Nx, enc_Ny,  enc_Nz, nCoils);
 
-        mat.kspace.raw = zeros(enc_Nx, enc_Ny, nCoils);
+            for p = 1:length(acqs_image)
 
-        for p = 1:length(acqs_image)
+                ky = meas.head.idx.kspace_encode_step_1(acqs_image(p)) + 1;
+                kz = meas.head.idx.kspace_encode_step_2(acqs_image(p)) + 1;
+                str_msg=sprintf('p %d  acqs_image(p)  %d  ky  %d  kz %d', p, acqs_image(p), ky, kz);  disp(str_msg);
 
-            ky = meas.head.idx.kspace_encode_step_1(acqs_image(p)) + 1;
-            str_msg=sprintf('p %d  acqs_image(p)  %d  ky  %d  kz %d', p, acqs_image(p), ky);  %disp(str_msg);
+                %echo = meas.head.idx.contrast(acqs_image(p)) + 1;
 
-            echo = meas.head.idx.contrast(acqs_image(p)) + 1;
+                mat.kspace.raw(:,ky,kz,:) = meas.data{acqs_image(p)};
 
-            mat.kspace.raw(:,ky,:) = meas.data{acqs_image(p)};
-
-        end
-
+            end
 
         kspace_data(:,:,:,:,ne)   = mat.kspace.raw;
-        TE(ne)                  = hdr.sequenceParameters.TE;
+        TE(ne)                    = hdr.sequenceParameters.TE;
 
     end
 

@@ -1,4 +1,4 @@
-function [kspace_data, output_tmp, TE] = hdf5_kspace_reader(path, files)
+function [kspace_data, output_tmp, TE] = hdf5_kspace_reader_multi_echoes(path, files)
 
     [status,id]= system('whoami');
 
@@ -8,23 +8,24 @@ function [kspace_data, output_tmp, TE] = hdf5_kspace_reader(path, files)
 
     [ str_network_imagerie, str_network_perso ] = get_network_name( str_user );
     
-    fprintf('\t Number of echoes : %d \n', size(files, 2));
-
-    for ne=1:size(files, 2)
-
-        number=num2str(files(ne));
+    number=num2str(files);
         
         filename = ['/home/', str_user, path ,number,'.h5'];
         
         if exist(filename, 'file')
             dset = ismrmrd.Dataset(filename, 'dataset');
-            fprintf('\t\t -- Echo %d : %s \n',ne, filename); 
+            fprintf('\t\t -- Echo : %s \n', filename); 
         else
             error(['File ' filename ' does not exist.  Please generate it.'])
         end
 
 
         hdr = ismrmrd.xml.deserialize(dset.readxml);
+        nechoes = hdr.encoding.encodingLimits.contrast.maximum + 1;
+    
+        fprintf('\t Number of echoes : %d \n', nechoes );
+
+    for ne=1:nechoes
 
         %% Encoding and reconstruction information
         % Matrix size
@@ -89,33 +90,34 @@ function [kspace_data, output_tmp, TE] = hdf5_kspace_reader(path, files)
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        contrast=1;
+        
         slice=1;
         rep=1;
 
         % donne le nombre de ligne correspondant à ces parametres
-        acqs_image = find(  (meas.head.idx.contrast==(contrast-1)) ...
+        acqs_image = find(  (meas.head.idx.contrast==(ne-1)) ...
             & (meas.head.idx.repetition==(rep-1)) ...
             & (meas.head.idx.slice==(slice-1))  );
 
         str_msg=sprintf('le nombre de lignes ACQ_IS_ ALL est  %d \n', size(acqs_image,2)); %disp(str_msg);
 
-        mat.kspace.raw = zeros(enc_Nx, enc_Ny, nCoils);
+        mat.kspace.raw = zeros(enc_Nx, enc_Ny,  enc_Nz, nCoils);
 
         for p = 1:length(acqs_image)
 
             ky = meas.head.idx.kspace_encode_step_1(acqs_image(p)) + 1;
-            str_msg=sprintf('p %d  acqs_image(p)  %d  ky  %d  kz %d', p, acqs_image(p), ky);  %disp(str_msg);
+            kz = meas.head.idx.kspace_encode_step_2(acqs_image(p)) + 1;
+            str_msg=sprintf('p %d  acqs_image(p)  %d  ky  %d  kz %d', p, acqs_image(p), ky, kz);  %disp(str_msg);
 
             echo = meas.head.idx.contrast(acqs_image(p)) + 1;
 
-            mat.kspace.raw(:,ky,:) = meas.data{acqs_image(p)};
+            mat.kspace.raw(:,ky,kz,:) = meas.data{acqs_image(p)};
 
         end
 
 
         kspace_data(:,:,:,:,ne)   = mat.kspace.raw;
-        TE(ne)                  = hdr.sequenceParameters.TE;
+        TE(ne)                  = hdr.sequenceParameters.TE(ne);
 
     end
 

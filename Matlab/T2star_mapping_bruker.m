@@ -5,11 +5,11 @@ function out = T2star_mapping_bruker(im, TE, name)
 
     %% Initialization
         % Don't pick the first echo which is not in steady state yet
-        %TE      = TE(2:end)';
         TE      = TE(1:2:end)';
         I       = abs(im(:,:,1:2:end)); % Use for the fit on In-phase state
         Ifull   = abs(im); % Use for recovery all the echoes and for plotting against the fit curve
         image   = I(:,:,1);
+        nechoes = size(I,3);
 
     %% Création du masque - Mise en forme des data
         % Show the image of interest
@@ -41,6 +41,12 @@ function out = T2star_mapping_bruker(im, TE, name)
             tmp = 0;
         end
         
+        % Then get the mean of the ROI values for each echoes
+        mS = nan(1,nechoes);
+        for k = 1:1:size(I,3)
+            mS(k) = mean(S(k,:),'omitnan');
+        end
+        
         %Full: vector of all pixels in the ROI during TE
         tmp        = 0 ;
         FullData   = [];
@@ -66,8 +72,21 @@ function out = T2star_mapping_bruker(im, TE, name)
         image_T2star    = 0*image;
         image_b         = 0*image;
         options=optimset('Display','off', 'Algorithm','levenberg-marquardt');
+        
+        % Fit of the mean of each ROI
+            % ROI fitting
+            x0(1) = 0;
+            x0(2) = mS(1);
+            x0(3) = 0;
+            res   = lsqcurvefit(@fitT2, x0, TE(:), mS(:), [], [], options);
 
-        % Fit
+            % Calcul du T2*
+            T2star = -1./res(3);
+            out.resmean = [res(1), res(2), T2star];
+            out.fitmean = out.resmean(3);
+            out.fitmean(out.fitmean<0) = 0;
+
+        % Fit pixel per pixel
         for k=1:1:numb_pixels_analyzed_signal
 
             % Update waitbar

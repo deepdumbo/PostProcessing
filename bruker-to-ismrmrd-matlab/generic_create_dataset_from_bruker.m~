@@ -42,7 +42,7 @@ check_if_iam_using_the_ihuserver(str_user);
 
 %% Boucle reco
 
-n_reco = [15];
+n_reco = [14];
 
 for numb = 1:size(n_reco,2)
     % acquisition_path=['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20171221/Dixon/24'];
@@ -51,10 +51,10 @@ for numb = 1:size(n_reco,2)
     %  output_tmp = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20171221/Dixon/13'];
 %     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20180122/Coeur_CC/',num2str(n_reco(numb))];
 %     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20180122/Coeur_CC/',num2str(n_reco(numb))];
-    acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20180122/',num2str(n_reco(numb))];
-    output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20180122/',num2str(n_reco(numb))];
-%     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Dixon_t2star/Vitro/',num2str(n_reco(numb))];
-%     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/',num2str(n_reco(numb))];
+%     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20180227/',num2str(n_reco(numb))];
+%     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20180227/',num2str(n_reco(numb))];
+    acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Validation/RawData/',num2str(n_reco(numb))];
+    output_tmp          = ['/home/', str_user, '/Dicom/DIXON/',num2str(n_reco(numb))];
 
     output_filename     = [output_tmp,'.h5'];
 

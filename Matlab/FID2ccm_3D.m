@@ -1,4 +1,4 @@
-function [im, Dixon, TE] = FID2ccm (mode)
+function [im, Dixon, TE] = FID2ccm_3D (mode)
 
 %%%%%        Routine script for reconstruction      %%%%%
 %%%%                                                 %%%%
@@ -25,8 +25,14 @@ if(strcmp(mode, 'Reco'))
 %% From hdf5 files already reconstructed with generic_create_dataset_from_bruker()
 elseif(strcmp(mode, 'h5'))
     disp('--> HDF5_KSPACE_READER');
-        echoes  = [30:39];
-        [data_for_acqp, output_tmp, TE] = hdf5_kspace_reader('/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20180227/',echoes);
+        echoes  = [14 20 14];
+        
+        if(size(echoes,2) > 1)
+            [data_for_acqp, output_tmp, TE] = hdf5_kspace_reader_3D('/Dicom/DIXON/Sheep_FAT/',echoes);
+        else
+            [data_for_acqp, output_tmp, TE] = hdf5_kspace_reader_multi_echoes('/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20180216/',echoes);
+        end
+        
         TE = TE';
     disp('<-- HDF5_KSPACE_READER');
 end
@@ -38,11 +44,16 @@ disp('--> DIXON_COIL_COMBINE');
         % Number of echoes
         nshow = 3;
         nechoes = size(TE,1);
-        im = Dixon_coil_combine(data_for_acqp, nechoes, mode);
-        im = permute(im, [1 2 4 3]);
+        
+        im = Dixon_coil_combine_3D(data_for_acqp, nechoes, mode);
+        
+        size(im)
         titles = cellstr(strcat('TE = ',num2str(TE(1:nshow,1),'%-.2f'), ' ms'));
         FRecoWM = ismrm_imshow(abs(im(:,:,1:nshow)),[],[1 nshow],titles, 'Walsh Reconstruction : Magnitude');
         FRecoWP = ismrm_imshow(angle(im(:,:,1:nshow)),[],[1 nshow],titles, 'Walsh Reconstruction : Phase');
+        
+        im = permute(im, [1 2 4 3]);
+        Dixon = 0;
 disp('<-- DIXON_COIL_COMBINE');
 
 %% 3 points Dixon reconstruction
@@ -53,9 +64,7 @@ disp('--> DIXON_3P');
     disp('    :: Water and Fat images');
           Dixon(:,:,1) = W;
           Dixon(:,:,2) = F;
-          figure('Name','Dixon :: Water','NumberTitle','off'); imagesc(abs(W)); axis square; axis off; colormap gray; colorbar; title('Water');
-          figure('Name','Dixon :: Fat','NumberTitle','off'); imagesc(abs(F)); axis square; axis off; colormap gray; colorbar; title('Fat');
-         % FDixW = ismrm_imshow(abs(Dixon),[],[1 2],{'Water' 'Fat'}, 'Dixon :: Walsh Reconstruction');
+          FDixW = ismrm_imshow(abs(Dixon),[],[1 2],{'Water' 'Fat'}, 'Dixon :: Walsh Reconstruction');
 disp('<-- DIXON_3P');
 
 % %% Save the .jpg
