@@ -12,7 +12,7 @@ if(strcmp(mode, 'Reco'))
 
     % Separate the different echoes from the global k-space into nechoes
     % k-space of the same dimensions.
-    data_ = zeros(enc_Nx, nCoils, enc_Ny, nechoes);
+    data_ = zeros(enc_Ny, nCoils, enc_Nx, nechoes);
 
     for ne = 1:nechoes
         data_(:,:,:,ne) = data_for_acqp(:,:,ne:nechoes:end);
@@ -21,7 +21,7 @@ if(strcmp(mode, 'Reco'))
     data_ = permute(data_, [1 3 2 4]);
 
 elseif(strcmp(mode, 'h5'))
-    [enc_Nx, enc_Ny, nCoils, ~] = size(data_for_acqp);
+    [enc_Ny, enc_Nx, nCoils, ~] = size(data_for_acqp);
     data_ = data_for_acqp;
 end
 
@@ -33,7 +33,7 @@ for ne=1:nechoes
     im_pre_whitening_remove = ifft_2D( data_pre_whitening_remove);
     
     % Coils combination
-    sum_= zeros(enc_Nx,enc_Ny);
+    sum_= zeros(enc_Ny,enc_Nx);
     for c = 1:nCoils
         sum_ = sum_ + abs(im_pre_whitening_remove(:,:,c)).*exp(angle(im_pre_whitening_remove(:,:,c)).*1j);
     end

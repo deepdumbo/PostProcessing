@@ -59,10 +59,10 @@ end
 phaseOff=phaseOffz;
 
 % Be careful of the sign of the offset
-phaseOff=phaseOff+(paramStructure.method.PVM_SPackArrReadOffset/abs(paramStructure.method.PVM_SPackArrReadOffset))*phaseOffx;
-%phaseOff=phaseOff+(paramStructure.method.PVM_SPackArrPhase1Offset/abs(paramStructure.method.PVM_SPackArrPhase1Offset))*phaseOffy*0.5;
+%phaseOff=phaseOff+(paramStructure.method.PVM_SPackArrReadOffset/abs(paramStructure.method.PVM_SPackArrReadOffset))*phaseOffx;
+phaseOff=phaseOff+(paramStructure.method.PVM_SPackArrPhase1Offset/abs(paramStructure.method.PVM_SPackArrPhase1Offset))*phaseOffy;
 
 
 phaseOff=exp(1i*2*pi*phaseOff);
-
+phaseOff = permute(phaseOff,[2 1 3]);
 end

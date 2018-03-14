@@ -73,9 +73,9 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, TE)
     % F2 will be interverted. To avoid this we need to tell when W>F and when
     % W<F thanks to the phase as p = +1 for W>F and p = -1 for W<F but for
     % better results we will take it as a continuous way.
-    unwr = Masked_Unwrap(S0, S1_, 0);
-    for x = 1:size(unwr, 2)
-        for y = 1:size(unwr, 1)
+    unwr = angle(S1_);
+    for x = 1:size(unwr, 1)
+        for y = 1:size(unwr, 2)
             if(phi(x,y) >= 0)
                 hc(x,y) = cos(unwr(x,y) - phi(x,y));
             elseif(phi(x,y) < 0)
@@ -86,8 +86,8 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, TE)
     hc = cos(unwr - phi);
     pc = NaN(size(hc));
 
-    for x = 1:size(hc, 2)
-        for y = 1:size(hc,1)
+    for x = 1:size(hc, 1)
+        for y = 1:size(hc,2)
 
             if(0.5 <= hc(x,y) && hc(x,y) <= 1)
                 pc(x,y) = 1;

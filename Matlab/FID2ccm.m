@@ -43,18 +43,22 @@ disp('--> DIXON_COIL_COMBINE');
         titles = cellstr(strcat('TE = ',num2str(TE(1:nshow,1),'%-.2f'), ' ms'));
         FRecoWM = ismrm_imshow(abs(im(:,:,1:nshow)),[],[1 nshow],titles, 'Walsh Reconstruction : Magnitude');
         FRecoWP = ismrm_imshow(angle(im(:,:,1:nshow)),[],[1 nshow],titles, 'Walsh Reconstruction : Phase');
+%                 titles = cellstr(strcat('TE = ',num2str(TE(7:nshow,1),'%-.2f'), ' ms'));
+%         FRecoWM = ismrm_imshow(abs(im(:,:,7:nshow)),[],[1 3],titles, 'Walsh Reconstruction : Magnitude');
+%         FRecoWP = ismrm_imshow(angle(im(:,:,7:nshow)),[],[1 3],titles, 'Walsh Reconstruction : Phase');
 disp('<-- DIXON_COIL_COMBINE');
 
 %% 3 points Dixon reconstruction
 disp('--> DIXON_3P');
     disp('    :: Dixon processing');
         [W, F] = Dixon_3P(im(:,:,1),im(:,:,2),im(:,:,3),TE);
+%         [W, F] = Dixon_3P(im(:,:,7),im(:,:,8),im(:,:,9),TE(7:end));
 
     disp('    :: Water and Fat images');
           Dixon(:,:,1) = W;
           Dixon(:,:,2) = F;
-          figure('Name','Dixon :: Water','NumberTitle','off'); imagesc(abs(W)); axis square; axis off; colormap gray; colorbar; title('Water');
-          figure('Name','Dixon :: Fat','NumberTitle','off'); imagesc(abs(F)); axis square; axis off; colormap gray; colorbar; title('Fat');
+          figure('Name','Dixon :: Water','NumberTitle','off'); imagesc(abs(W)); axis image; axis off; colormap gray; colorbar; title('Water');
+          figure('Name','Dixon :: Fat','NumberTitle','off'); imagesc(abs(F)); axis image; axis off; colormap gray; colorbar; title('Fat');
          % FDixW = ismrm_imshow(abs(Dixon),[],[1 2],{'Water' 'Fat'}, 'Dixon :: Walsh Reconstruction');
 disp('<-- DIXON_3P');
 

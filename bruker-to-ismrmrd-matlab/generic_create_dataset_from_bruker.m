@@ -42,7 +42,7 @@ check_if_iam_using_the_ihuserver(str_user);
 
 %% Boucle reco
 
-n_reco = [15];
+n_reco = [39];
 
 for numb = 1:size(n_reco,2)
     % acquisition_path=['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20171221/Dixon/24'];
@@ -51,8 +51,10 @@ for numb = 1:size(n_reco,2)
     %  output_tmp = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20171221/Dixon/13'];
 %     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20180122/Coeur_CC/',num2str(n_reco(numb))];
 %     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20180122/Coeur_CC/',num2str(n_reco(numb))];
-    acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20180122/',num2str(n_reco(numb))];
-    output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20180122/',num2str(n_reco(numb))];
+%     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20180227/',num2str(n_reco(numb))];
+%     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20180227/',num2str(n_reco(numb))];
+      acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20180216/',num2str(n_reco(numb))];
+      output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20180216/',num2str(n_reco(numb))];
 %     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Dixon_t2star/Vitro/',num2str(n_reco(numb))];
 %     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/',num2str(n_reco(numb))];
 
@@ -220,12 +222,12 @@ for numb = 1:size(n_reco,2)
          ch = size(data_for_acqp, 2);
 
         Offcenter = phaseOffsetCorrection(ex);
-            
+
             data_for_acqp = permute(data_for_acqp,[3 1 2]);
             tmp = data_for_acqp;
         for ne=1:ex.method.PVM_NEchoImages
              for k=1:ch
-                for jj=1:E1
+                for jj=1:readout
                         data_for_acqp(ne:ex.method.PVM_NEchoImages:end,jj,k)= tmp(ne:ex.method.PVM_NEchoImages:end,jj,k).*Offcenter(:,jj,:);
                 end
              end

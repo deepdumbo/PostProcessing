@@ -1,20 +1,30 @@
 
 %% Initial parameters
 % T1 of the tissu without C.A.
-T1tissu     = 1.43; % s
-T1desired   = 0.5; % s
+T1tissu     = 1500      / 1000; % s
 
 % T2 of the tissu without C.A.
-T2tissu     = 0.230; % s
-T2desired   = 0.1; % s
+T2tissu     = 430     / 1000; % s
+T2desired   = 50   / 1000; % s
 
 % Contrast Agent
-M           = 159.609 * 0.001;  % g/mmol (CuSO4 + 5H2O)
-r1          = 0.67;     % mM/s (CuSO4 + 5H2O)
-r2          = 1.04;     % mM/s (CuSO4 + 5H2O)
+%ca = 'cuso4';
+ca = 'mncl2';
+
+if(strcmp(ca,'cuso4'))
+    M           = 159.609 * 0.001;  % g/mmol (CuSO4 + 5H2O)
+    r1          = 0.67;     % mM/s (CuSO4 + 5H2O)
+    r2          = 1.04;     % mM/s (CuSO4 + 5H2O)
+end
+
+if(strcmp(ca,'mncl2'))
+    M           = 95.211 * 0.001;  % g/mmol (MnCl2 + 5H2O)
+    r1          = 6.397;     % mM/s (MnCl2 + 5H2O)
+    r2          = 108.266;     % mM/s (MnCl2 + 5H2O)
+end
 
 % Volume desired
-V           = 50; % mL
+V           = 350; % mL
 
 
 %% Calculation based on T2

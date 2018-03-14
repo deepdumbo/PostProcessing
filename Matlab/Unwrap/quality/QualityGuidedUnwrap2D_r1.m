@@ -46,7 +46,7 @@ im_phase_quality = PhaseDerivativeVariance_r1(im_phase.*im_mask);
 minp = im_phase_quality(2:end-1, 2:end-1); minp = min(minp(:));
 maxp = im_phase_quality(2:end-1, 2:end-1); maxp = max(maxp(:));
 if(1)    % Chose starting point interactively
-  f = figure('Name','Unwrap seed selection','Numbertitle','Off'); imagesc(im_phase_quality,[minp maxp]), colormap(gray), colorbar, axis square, axis off; title('Phase quality map'); 
+  f = figure('Name','Unwrap seed selection','Numbertitle','Off'); imagesc(im_phase_quality,[minp maxp]), colormap(gray), colorbar, axis image, axis off; title('Phase quality map'); 
   set(0, 'currentfigure', f); % Make sure that the figure is current for using ginput
   uiwait(msgbox('Select known true phase reference phase point. Black = high quality phase; white = low quality phase.','Phase reference point','modal'));
   [xpoint,ypoint] = ginput(1);                %Select starting point for the guided floodfill algorithm
