@@ -29,10 +29,10 @@ end
 
 
 lala= ex.method.PVM_EncSteps1+ round(nY/2);
-lili=lala(2:end)-lala(1:end-1);
+lili=lala(2:end)-lala(1:end-1)
 
-u=find(lili==1);
-v=find(lili==2);
+u=find(lili==1)
+v=find(lili==2)
 
 % size(lala)
 
@@ -72,8 +72,8 @@ if (acceleration_factor_y>1)
     size(u);
     size(v);
     size(u)+size(v);
-    lala(u);
-    Ysamp_ACS;
+    lala(u)
+    Ysamp_ACS
     
 else
     

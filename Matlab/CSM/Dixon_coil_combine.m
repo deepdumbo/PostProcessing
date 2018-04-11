@@ -43,8 +43,8 @@ for ne=1:nechoes
     phase_pre_whitening_remove = angle(sum_);
     
     % Coil sensibility map estimation
-    csm_walsh(:,:,:,ne) = ismrm_estimate_csm_walsh(ifft_2D(data_pre_whitening_remove));
-    %csm_inati(:,:,:,ne) = coil_map_study_2d_Inati( ifft_2D(data_pre_whitening_remove), 5, 3 );
+    csm_walsh(:,:,:,ne) = ismrm_estimate_csm_walsh(im_pre_whitening_remove);
+    %csm_inati(:,:,:,ne) = coil_map_study_2d_Inati( im_pre_whitening_remove, 5, 3 );
     
     % Correct csm to fit the shading profile with a square root sum-of-square channel combination
     csm_walsh(:,:,:,ne) = ismrm_normalize_shading_to_sos(csm_walsh(:,:,:,ne));
@@ -55,7 +55,7 @@ for ne=1:nechoes
     %ccm_inati(:,:,:,ne) = ismrm_compute_ccm(csm_inati(:,:,:,ne));
 
     % Reconstruction of the images
-    im_walsh(:,:,:,ne) = sum(ifft_2D(data_pre_whitening_remove) .* ccm_walsh(:,:,:,ne), 3);
+    im_walsh(:,:,:,ne) = sum(im_pre_whitening_remove .* ccm_walsh(:,:,:,ne), 3);
     %im_inati(:,:,:,ne) = sum(ifft_2D(data_pre_whitening_remove) .* ccm_inati(:,:,:,ne), 3);
 
 %     figure(4)

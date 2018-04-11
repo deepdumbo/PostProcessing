@@ -8,7 +8,8 @@ function [PercentFat] = FatPercentage(im)
     assert( size(im,3) > 2, '2-D image must have at least 3 echoes');
 
     % Study only the abs()
-    absim = abs(im);
+    %absim = abs(im);
+    absim = im;
     
     % In-phase corrected acquisition
     INCOR = ( absim(:,:,1) + absim(:,:,3) ) ./ 2;

@@ -8,7 +8,7 @@ function [im, Dixon, TE] = FID2ccm (mode)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-close all;
+%close all;
 
 %% First add path of the necessary functions
 addpath('CSM/');
@@ -19,14 +19,14 @@ addpath('Unwrap/quality/');
 %% FID reconstruction
 if(strcmp(mode, 'Reco'))
     disp('--> GENERIC_CREATE_DATASET_FROM_BRUKER');
-        generic_create_dataset_from_bruker();
+        generic_create_dataset_from_bruker_SAVED();
     disp('<-- GENERIC_CREATE_DATASET_FROM_BRUKER');
 
 %% From hdf5 files already reconstructed with generic_create_dataset_from_bruker()
 elseif(strcmp(mode, 'h5'))
     disp('--> HDF5_KSPACE_READER');
-        echoes  = [30:39];
-        [data_for_acqp, output_tmp, TE] = hdf5_kspace_reader('/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20180227/',echoes);
+        echoes  = [11:91];
+        [data_for_acqp, output_tmp, TE] = hdf5_kspace_reader('/Dicom/DIXON/Verification/In_Vitro/2D/20180322/',echoes);
         TE = TE';
     disp('<-- HDF5_KSPACE_READER');
 end

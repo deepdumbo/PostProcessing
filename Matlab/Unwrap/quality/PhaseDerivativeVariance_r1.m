@@ -12,7 +12,7 @@
 %            Corrected a bug on the line before computing dy(dimx,:)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function derivative_variance = PhaseDerivativeVariance(IM_phase, varargin)
+function derivative_variance = PhaseDerivativeVariance_r1(IM_phase, varargin)
 
 [r_dim,c_dim] = size(IM_phase);
 if nargin>=2                                    %Has a mask been included? If so crop the image to the mask borders to save computational time

@@ -23,17 +23,17 @@ IM = ones(size(im_mag)); % Not really the complex image; just used for size()
 
 %% Replace with your mask (if required)
 mag_max = max(im_mag(:));
-indx1 = im_mag < thresh*mag_max;  %Intensity = mag^2, so this = .01 threshold on the intensity
+indx1 = im_mag > thresh*mag_max;  %Intensity = mag^2, so this = .01 threshold on the intensity
 % mag_std = std(im_mag(:)); % Use if you want standard-deviation-based mask
 % mag_avg = mean(im_mag(:));
 % indx1 = im_mag < (mag_avg-2*mag_std);  %2 std_devs below mean
-im_mask = ones(size(IM));
-im_mask(indx1) = 0;                  %Mask
+im_mask = zeros(size(IM));
+im_mask(indx1) = 1;                  %Mask
 if(~exist('im_mask','var'))
   im_mask = (ones(size(IM)));          %Mask (if applicable)
 end
-%figure; imagesc(im_mag.*im_mask),   colormap(gray), axis square, axis off, title('Initial masked magnitude'); colorbar;
-%figure; imagesc(im_phase.*im_mask), colormap(gray), axis square, axis off, title('Initial masked phase'); colorbar;
+figure; imagesc(im_mag.*im_mask),   colormap(gray), axis square, axis off, title('Initial masked magnitude'); colorbar;
+figure; imagesc(im_phase.*im_mask), colormap(gray), axis square, axis off, title('Initial masked phase'); colorbar;
 
 im_unwrapped = nan(size(IM));        %Initialze the output unwrapped version of the phase
 adjoin = zeros(size(IM));            %Zero starting matrix for adjoin matrix
@@ -69,7 +69,7 @@ if im_mask(rowref, colref+1, 1)==1;  adjoin(rowref, colref+1, 1) = 1; end
 im_unwrapped = GuidedFloodFill_r1(im_phase, im_mag, im_unwrapped, unwrapped_binary, im_phase_quality, adjoin, im_mask);    %Unwrap
 
 %% Plot images
-% figure; imagesc(im_mag),       colormap(gray), colorbar, axis square, axis off; title('QG Magnitude image'); 
-% figure; imagesc(im_phase),     colormap(gray), colorbar, axis square, axis off; title('QG Wrapped phase'); 
-% figure; imagesc(im_phase_quality,[minp maxp]), colormap(gray), axis square, axis off, title('QG Phase quality map'); colorbar;
-% figure; imagesc(im_unwrapped), colormap(gray), colorbar, axis square, axis off; title('QG Unwrapped phase'); 
+figure; imagesc(im_mag),       colormap(gray), colorbar, axis square, axis off; title('QG Magnitude image'); 
+figure; imagesc(im_phase),     colormap(gray), colorbar, axis square, axis off; title('QG Wrapped phase'); 
+figure; imagesc(im_phase_quality,[minp maxp]), colormap(gray), axis square, axis off, title('QG Phase quality map'); colorbar;
+figure; imagesc(im_unwrapped), colormap(gray), colorbar, axis square, axis off; title('QG Unwrapped phase'); 

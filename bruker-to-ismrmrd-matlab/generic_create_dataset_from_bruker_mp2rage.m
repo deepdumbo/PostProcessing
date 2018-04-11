@@ -23,9 +23,6 @@ close all
 % * E11 3D GRAPPA Y
 % * E12 3D normal
 
-%% voici les reco qui ne fonctionne pas
-% *mp2rage
-
 
 
 [status,id]= system('whoami');
@@ -36,13 +33,11 @@ check_if_iam_using_the_ihuserver(str_user);
 
 [ str_network_imagerie, str_network_perso ] = get_network_name( str_user );
 
-
-
 % acquisition_path='/home/valery/Reseau/Imagerie/DICOM_DATA/2017-07-07-test_mp2rage_1/4/';  % grappa 2 * 2
 % acquisition_path='/home/valery/DICOM/badres/11/'; % fully  % ne marche
 % pas ?
 %  acquisition_path='/home/valery/Reseau/Imagerie/DICOM_DATA/2017-07-07-test_mp2rage_1/15/'; % CS
-%acquisition_path=['/home/',str_user, str_network_imagerie,'/DICOM_DATA/2017-07-07-test_mp2rage_1/16/'];  % fully
+% acquisition_path=['/home/',str_user, str_network_imagerie,'/DICOM_DATA/2017-07-07-test_mp2rage_1/16/'];  % fully
 %  acquisition_path='/home/valery/Reseau/Imagerie/DICOM_DATA/2017-07-07-test_mp2rage_1/19/'  % grappa 2 * 2
 % acquisition_path='/home/valery/Reseau/Imagerie/DICOM_DATA/2017-07-07-test_mp2rage_2/13'; %fully  ok
 % acquisition_path='/home/valery/Reseau/Imagerie/DICOM_DATA/2017-07-07-test_mp2rage_2/14'; %grappa 2  ok
@@ -54,10 +49,16 @@ check_if_iam_using_the_ihuserver(str_user);
 % acquisition_path='/home/valery/DICOM/tests13062017/74/';
 % acquisition_path='/home/valery/Reseau/Imagerie/Auckland/Kadence/Control/2016_05_03_Heart_2/17/';
 
-%output_filename = '/home/valery/DICOM/testdata.h5';
-n_reco = [20];
-    acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Sheep_FAT/',num2str(n_reco)];
-    output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Sheep_FAT/',num2str(n_reco)];
+% acquisition_path='/home/valery/DICOM/2017-10-23_mp2rage/2'; % phantom grappa
+% acquisition_path='/home/valery/DICOM/2017-10-24_mp2rage_coeur/6';
+% acquisition_path='/home/valery/DICOM/2017-10-24_mp2rage_coeur/7';
+% acquisition_path='/home/valery/DICOM/99/'   %% human heart  grappa y
+
+% acquisition_path='/home/valery/DICOM/103/'   %% human heart
+acquisition_path='/home/valery/DICOM/105/'   %% human heart
+% acquisition_path='/home/valery/DICOM/2017-10-24_mp2rage_coeur/8';
+% acquisition_path='/home/valery/DICOM/2017-10-24_mp2rage_coeur/9';
+output_filename = '/home/valery/DICOM/testdata.h5';
 
 %% reading bruker acqp, method and fid files.
 
@@ -141,7 +142,19 @@ if (mod(readout,2)==1)
     header.encoding.encodedSpace.matrixSize.x=readout;
     header.encoding.reconSpace.matrixSize.x=readout;
     
+    kspace=zeros(readout, size( data_for_acqp,2),size( data_for_acqp,3)); 
+    
+    kspace(1:end-1,:,:)=data_for_acqp(:,:,:);     
+      
+    clear data_for_acqp
+   
+    data_for_acqp=kspace;
+    
+    clear  kspace
+    
 end
+
+
 
 clear  check_indice
 
@@ -155,12 +168,10 @@ for i = 1:size(idx.kspace_encode_step_1,2)
     end
 end
 
+
 figure()
 subplot(2,1,1); imagesc(check_indice(:,:,1));
 subplot(2,1,2); imagesc(check_indice(:,:,2));
-
-
-
 
 
 % [ idx ] = fill_the_idx_mp2rage_test( header , ex);
@@ -251,7 +262,33 @@ if (acceleration_factor_y>1 || acceleration_factor_z>1)
     
     
 end
-
+% 
+% kspace=zeros(200,7,200,200,2);
+% 
+% 
+% for acqno = 1:number_of_lines
+%     
+%         
+%    e1=idx.kspace_encode_step_1(acqno)+1;
+%    e2=idx.kspace_encode_step_2(acqno)+1;
+%    echo=idx.contrast(acqno)+1;    
+%    
+%    kspace(:,:,e1,e2, echo)=   data_for_acqp(:,:,acqno); 
+%    
+%    
+%    
+% end
+% 
+% 
+% for acqno = 1:number_of_lines
+%     
+%     e1=idx.kspace_encode_step_1(acqno)+1;
+%     e2=idx.kspace_encode_step_2(acqno)+1;
+%     echo=idx.contrast(acqno)+1;    
+%     
+%     new_data_for_acqp(:,:,acqno)= kspace(:,:,e1,e2, echo);
+% 
+% end
 
 
 
@@ -289,6 +326,7 @@ acqblock.head.slice_dir = repmat([0 0 1]',[1 number_of_lines]);
 
 % Loop over the acquisitions, set the header, set the data and append
 
+
 for acqno = 1:number_of_lines
     
     % Set the header elements that change from acquisition to the next
@@ -299,6 +337,9 @@ for acqno = 1:number_of_lines
     acqblock.head.idx.repetition(acqno) = idx.repetition(acqno);
     acqblock.head.idx.slice(acqno) = idx.slice(acqno);
     acqblock.head.idx.contrast(acqno) = idx.contrast(acqno);
+    acqblock.head.sample_time_us(acqno)=1;    
+    %% TODO a verifier EffReadOffset ?
+    acqblock.head.position(:,acqno)=[ex.method.PVM_EffPhase0Offset,ex.method.PVM_EffPhase1Offset,ex.method.PVM_EffPhase2Offset];
     
     % Set the flags
     acqblock.head.flagClearAll(acqno);
@@ -318,16 +359,18 @@ for acqno = 1:number_of_lines
                 
                 if ismember(idx.kspace_encode_step_1(acqno),regular_sampling_y-1)
                     % both calibration and part of the undersampled pattern
+                    str_msg=sprintf('y> 1 & z==1  %d ACQ_IS_PARALLEL_CALIBRATION_AND_IMAGING %d %d', acqno , idx.kspace_encode_step_1(acqno), idx.kspace_encode_step_2(acqno)); disp(str_msg);
                     acqblock.head.flagSet('ACQ_IS_PARALLEL_CALIBRATION_AND_IMAGING', acqno);
+                    str_smg=sprintf('y>1 && z==1  ACQ_IS_PARALLEL_CALIBRATION_AND_IMAGING %d  %d  %d', acqno, idx.kspace_encode_step_1(acqno), idx.kspace_encode_step_2(acqno)); disp(str_smg);
                     %                 disp('both calibration and part of the undersampled pattern');
                 else
                     % in ACS block but not part of the regular undersampling
+                    str_msg=sprintf('y> 1 & z==1  %d ACQ_IS_PARALLEL_CALIBRATION %d %d', acqno , idx.kspace_encode_step_1(acqno), idx.kspace_encode_step_2(acqno)); disp(str_msg);
                     acqblock.head.flagSet('ACQ_IS_PARALLEL_CALIBRATION', acqno) ;
+                    str_smg=sprintf('y>1 && z==1  ACQ_IS_PARALLEL_CALIBRATION %d  %d  %d ', acqno, idx.kspace_encode_step_1(acqno), idx.kspace_encode_step_2(acqno)); disp(str_smg);
                     %                 disp('in ACS block but not part of the regular undersampling');
                 end
-                
-                
-                
+                 
             end
         end
     end
@@ -338,19 +381,22 @@ for acqno = 1:number_of_lines
         if ismember(idx.kspace_encode_step_1(acqno),ligne_du_milieu_suivant_y_value-1)
             
             if ismember(idx.kspace_encode_step_2(acqno),acs_indice_z-1)
-                %                 if ismember(idx.kspace_encode_step_1(acqno),Ysamp_ACS-1)
-                
+                %                 if ismember(idx.kspace_encode_step_1(acqno),Ysamp_ACS-1)                
                 
                 %% attention si on mais Ysamp_ACS sans le moins 1 la phase n'est pas bonne
                 %la conditon dans le carrée est respecté
                 
                 if ismember(idx.kspace_encode_step_2(acqno),regular_sampling_z-1)
                     % both calibration and part of the undersampled pattern
+                    str_msg=sprintf('y==1 & z>1  %d ACQ_IS_PARALLEL_CALIBRATION_AND_IMAGING %d %d', acqno , idx.kspace_encode_step_1(acqno), idx.kspace_encode_step_2(acqno)); disp(str_msg);
                     acqblock.head.flagSet('ACQ_IS_PARALLEL_CALIBRATION_AND_IMAGING', acqno);
+                    str_smg=sprintf('y==1 && z>1  ACQ_IS_PARALLEL_CALIBRATION_AND_IMAGING %d  %d  %d ', acqno, idx.kspace_encode_step_1(acqno), idx.kspace_encode_step_2(acqno)); disp(str_smg);
                     %                 disp('both calibration and part of the undersampled pattern');
                 else
                     % in ACS block but not part of the regular undersampling
+                    str_msg=sprintf('y==1 & z>1  %d ACQ_IS_PARALLEL_CALIBRATION %d %d', acqno , idx.kspace_encode_step_1(acqno), idx.kspace_encode_step_2(acqno)); disp(str_msg);
                     acqblock.head.flagSet('ACQ_IS_PARALLEL_CALIBRATION', acqno) ;
+                    str_smg=sprintf('y==1 && z>1  ACQ_IS_PARALLEL_CALIBRATION %d  %d  %d ', acqno, idx.kspace_encode_step_1(acqno), idx.kspace_encode_step_2(acqno)); disp(str_smg);
                     %                 disp('in ACS block but not part of the regular undersampling');
                 end
                 
@@ -373,10 +419,12 @@ for acqno = 1:number_of_lines
                 
                 if ismember(idx.kspace_encode_step_2(acqno),regular_sampling_z-1) && ismember(idx.kspace_encode_step_1(acqno),regular_sampling_y-1)
                     % both calibration and part of the undersampled pattern
+                     str_msg=sprintf('y> 1 & z>1  %d ACQ_IS_PARALLEL_CALIBRATION_AND_IMAGING %d %d', acqno , idx.kspace_encode_step_1(acqno), idx.kspace_encode_step_2(acqno)); disp(str_msg);
                     acqblock.head.flagSet('ACQ_IS_PARALLEL_CALIBRATION_AND_IMAGING', acqno);
                     %                 disp('both calibration and part of the undersampled pattern');
                 else
                     % in ACS block but not part of the regular undersampling
+                     str_msg=sprintf('y> 1 & z>1  %d ACQ_IS_PARALLEL_CALIBRATION %d %d', acqno , idx.kspace_encode_step_1(acqno), idx.kspace_encode_step_2(acqno)); disp(str_msg);
                     acqblock.head.flagSet('ACQ_IS_PARALLEL_CALIBRATION', acqno) ;
                     %                 disp('in ACS block but not part of the regular undersampling');
                 end  
@@ -453,7 +501,8 @@ dset.close();
 
 
 
-
+disp('sample time');
+disp(1/ex.acqp.SW_h*1e6)
 
 
 

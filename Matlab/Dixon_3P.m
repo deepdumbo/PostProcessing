@@ -54,15 +54,11 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, TE)
 % in an in phase state for W and F. 
     
     % Get phi
-%      tresh = 0.005; % Treshold for the noise
-%      phi_2 = QualityGuidedUnwrap2D_r1(abs(S2_),wrapped, tresh);
-     phi_2 = Masked_Unwrap(S0, S2_, 0);
-%      phi_2(phi_2 > 0) = phi_2(phi_2 > 0) - pi;
-%      phi_2(phi_2 < -2*pi) = phi_2(phi_2 < -2*pi) - (max(max(phi_2(phi_2 < -2*pi))) + 2*pi);
-     
+     [phi_2, mask] = Masked_Unwrap(S0, S2_, 0);
      phi   = phi_2 / 2;
+    % phi = phi + 5*pi;
     
-    ismrm_imshow(phi_2,[],[1 1],{'2\phi unwrapped'},'Phase unwrapping');
+  
     
     % Initialize A
     A = sqrt( abs( S2 ) ./ S0_ );
@@ -74,6 +70,7 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, TE)
     % W<F thanks to the phase as p = +1 for W>F and p = -1 for W<F but for
     % better results we will take it as a continuous way.
     unwr = angle(S1_);
+    hc = nan(size(S0));
     for x = 1:size(unwr, 1)
         for y = 1:size(unwr, 2)
             if(phi(x,y) >= 0)
@@ -83,9 +80,17 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, TE)
             end
         end
     end
-    hc = cos(unwr - phi);
+    %hc = cos(unwr - phi);
     pc = NaN(size(hc));
-
+    
+    figure('Name','Phase comp');
+    subplot(1,3,1); imagesc(phi_2); colormap gray; axis image; title('phi2');
+    subplot(1,3,2); imagesc(unwr); colormap gray; axis image; title('angle(S1)');
+    subplot(1,3,3); imagesc(pc); colormap gray; axis image; title('hc');
+    
+    %ismrm_imshow(phi_2,[],[1 1],{'2\phi unwrapped'},'Phase unwrapping');
+    
+    
     for x = 1:size(hc, 1)
         for y = 1:size(hc,2)
 
@@ -102,11 +107,8 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, TE)
     
     if(Debug)
         curr = 140;
-        wrapped = wrap(angle(S2_),0);
         figure('Name','Plot comp'); 
         plot(phi_2(curr,:),'b'); 
-        %hold on; plot(wrapped(curr,:),'r'); 
-        %hold on; plot((phi_2(curr,:)-wrapped(curr,:)),'g-');
         hold on; plot(phi(curr,:),'k-');
         hold on; plot(pc(curr,:),'ko');
         base = unwr - phi;
@@ -114,7 +116,7 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, TE)
         hold on; plot(unwr(curr,:),'m');
         hold on; line([0 size(phi_2,2)],[pi pi],'LineWidth',0.5,'Color',[0 0 0]); hold on; line([0 size(phi_2,2)],[-pi -pi],'LineWidth',0.5,'Color',[0 0 0]);
         %legend('Unwrapped 2\phi','Wrapped 2\phi','Unwrapped - Wrapped','\phi','Pc points','ang(S1\_) - \phi','ang(S1\_)');
-        legend('Unwrapped 2\phi','\phi','Pc points','ang(S1\_) - \phi','Unwrapped ang(S1\_)');
+        legend('Unwrapped 2\phi','\phi','Pc points','ang(S1\_) - \phi','Wrapped ang(S1\_)');
         clear curr
     end
     
@@ -123,8 +125,8 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, TE)
         ismrm_imshow(tt,[],[1 2],{'hc' 'pc'},'Water/Fat attribution');
    
     % Get W and F images
-    W = (S0_ + (pc.*abs(S1))./ A) ./ 2;
-    F = (S0_ - (pc.*abs(S1))./ A) ./ 2;
+    W = (S0_ + (hc.*abs(S1))./ A) ./ 2;
+    F = (S0_ - (hc.*abs(S1))./ A) ./ 2;
 
 end
 

@@ -16,6 +16,11 @@ elseif (strcmp(str_user,'juliem'))
     
    str_network_imagerie='/mount/Imagerie/';
     str_network_perso='/mount/julie.magat/';
+   
+elseif (strcmp(str_user,'kylianh'))
+
+str_network_imagerie='/mount/Imagerie/';
+str_network_perso='/mount/kylian.haliot/';
     
 else
    

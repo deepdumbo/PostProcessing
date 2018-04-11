@@ -15,12 +15,22 @@ header = [];
 % Experimental Conditions (Required)
 header.experimentalConditions.H1resonanceFrequency_Hz = ex.method.PVM_FrqRef(1)*1e6; % 9.4T
 
+
+header.measurementInformation.measurementID='2';
+header.measurementInformation.patientPosition='HFS';
+header.measurementInformation.protocolName='Flash';
+header.measurementInformation.frameOfReferenceUID='lalala'
+header.measurementInformation.measurementDependency.dependencyType='Noise';
+header.measurementInformation.measurementDependency.measurementID='1';
+
+
+
 % Acquisition System Information (Optional)
 header.acquisitionSystemInformation.systemVendor = ex.acqp.ORIGIN{1};
 header.acquisitionSystemInformation.systemModel = ex.acqp.ACQ_station{1};
 header.acquisitionSystemInformation.systemFieldStrength_T= ex.acqp.BF1/42.577;
 header.acquisitionSystemInformation.receiverChannels = ex.method.PVM_EncNReceivers;
-% header.acquisitionSystemInformation.relativeReceiverNoiseBandwidth
+header.acquisitionSystemInformation.relativeReceiverNoiseBandwidth=1;
 header.acquisitionSystemInformation.institutionName =ex.acqp.ACQ_institution{1};
 header.acquisitionSystemInformation.stationName =ex.acqp.ACQ_station{1};
  
@@ -71,11 +81,11 @@ if (ex.method.PVM_EncPft(2)~=1)
     disp('attention partial fourier suivant y')
     header.encoding.encodingLimits.kspace_encoding_step_1.minimum = ex.method.PVM_EncSteps1(1) + round(nY/2);
     header.encoding.encodingLimits.kspace_encoding_step_1.maximum =   ex.method.PVM_EncSteps1(end) + round(nY/2);
-    header.encoding.encodingLimits.kspace_encoding_step_1.center =  round(nY/2);
+    header.encoding.encodingLimits.kspace_encoding_step_1.center =  round(nY/2)+1;
 else
     header.encoding.encodingLimits.kspace_encoding_step_1.minimum = 0;
     header.encoding.encodingLimits.kspace_encoding_step_1.maximum = nY-1;
-    header.encoding.encodingLimits.kspace_encoding_step_1.center = floor(nY/2)-1;
+    header.encoding.encodingLimits.kspace_encoding_step_1.center = floor(nY/2);
 end
 
 
@@ -88,7 +98,7 @@ end
 if(nZ>1)
     header.encoding.encodingLimits.kspace_encoding_step_2.minimum = 0;
     header.encoding.encodingLimits.kspace_encoding_step_2.maximum = nZ-1;
-    header.encoding.encodingLimits.kspace_encoding_step_2.center = floor(nZ/2)-1;
+    header.encoding.encodingLimits.kspace_encoding_step_2.center = floor(nZ/2);
     
 else
     header.encoding.encodingLimits.kspace_encoding_step_2.minimum = 0;
@@ -97,11 +107,15 @@ else
     
 end
 
-if(nZ>1)
-    header.encoding.encodingLimits.slice.minimum = 0;
-    header.encoding.encodingLimits.slice.maximum = nZ-1;
-    header.encoding.encodingLimits.slice.center = floor(nZ/2)-1;    
-else
+[ number_of_slices ] = get_number_of_slices( ex );
+
+% if(number_of_slices>1)
+%     header.encoding.encodingLimits.slice.minimum = 0;
+%     header.encoding.encodingLimits.slice.maximum = nZ-1;
+%     header.encoding.encodingLimits.slice.center = floor(nZ/2)-1;    
+% end    
+    
+ if (number_of_slices>1)
     header.encoding.encodingLimits.slice.minimum = 0;
     header.encoding.encodingLimits.slice.maximum = ex.method.PVM_SPackArrNSlices-1;
     header.encoding.encodingLimits.slice.center = 0;
@@ -154,6 +168,14 @@ fprintf('Encoding field_of_view : %d %d %d\n', header.encoding.encodedSpace.fiel
 fprintf('Recon matrix size : %d %d %d\n', header.encoding.reconSpace.matrixSize.x,  header.encoding.reconSpace.matrixSize.y ,  header.encoding.reconSpace.matrixSize.z);
 fprintf('Recon field_of_view : %d %d %d\n', header.encoding.reconSpace.fieldOfView_mm.x, header.encoding.reconSpace.fieldOfView_mm.y , header.encoding.reconSpace.fieldOfView_mm.z);
 fprintf('-------------------------------------------------------------- \n');
+
+header.sequenceParameters.TR= ex.method.PVM_RepetitionTime;
+header.sequenceParameters.TE= ex.acqp.ACQ_echo_time;
+
+% header.sequenceParameters.TE(2)= 4;
+% header.sequenceParameters.TE(3)= ex.method.PVM_EchoTime+2;
+% header.sequenceParameters.TE(4)= ex.method.PVM_EchoTime+3;
+header.sequenceParameters.flipAngle_deg=ex.acqp.ACQ_flip_angle;
 
 
 

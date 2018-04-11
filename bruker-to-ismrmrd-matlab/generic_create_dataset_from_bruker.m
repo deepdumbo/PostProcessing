@@ -1,6 +1,6 @@
 %% Read Bruker File
 
-%clear all
+clear all
 %close all
 
 
@@ -42,26 +42,28 @@ check_if_iam_using_the_ihuserver(str_user);
 
 %% Boucle reco
 
-n_reco = [39];
+n_reco = [5:35];
 
 for numb = 1:size(n_reco,2)
-    % acquisition_path=['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20171221/Dixon/24'];
-    % output_tmp = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20171221/Dixon/24'];
-    %  acquisition_path=['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20171221/Dixon/13'];
-    %  output_tmp = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20171221/Dixon/13'];
-%     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20180122/Coeur_CC/',num2str(n_reco(numb))];
-%     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20180122/Coeur_CC/',num2str(n_reco(numb))];
-%     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20180227/',num2str(n_reco(numb))];
-%     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20180227/',num2str(n_reco(numb))];
-      acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20180216/',num2str(n_reco(numb))];
-      output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20180216/',num2str(n_reco(numb))];
-%     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Dixon_t2star/Vitro/',num2str(n_reco(numb))];
-%     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/',num2str(n_reco(numb))];
+        % acquisition_path=['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20171221/Dixon/24'];
+        % output_tmp = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20171221/Dixon/24'];
+        %  acquisition_path=['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20171221/Dixon/13'];
+        %  output_tmp = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20171221/Dixon/13'];
+%         acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20180216/',num2str(n_reco(numb))];
+%         output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20180216/',num2str(n_reco(numb))];
+    %     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20180227/',num2str(n_reco(numb))];
+    %     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20180227/',num2str(n_reco(numb))];
+          acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Verification/Ex_Vivo/2D/20180326_Unmasc/',num2str(n_reco(numb))];
+          output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Verification/Ex_Vivo/2D/20180326_Unmasc/',num2str(n_reco(numb))];
+    %     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Dixon_t2star/Vitro/',num2str(n_reco(numb))];
+    %     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/',num2str(n_reco(numb))];
 
-    output_filename     = [output_tmp,'.h5'];
+        output_filename     = [output_tmp,'.h5'];
 
 
-    %% reading bruker acqp, method and fid files. 
+        %% reading bruker acqp, method and fid files. 
+
+    %% reading bruker acqp, method and fid files.
 
     ex = read_bru_experiment(acquisition_path);
 
@@ -75,45 +77,25 @@ for numb = 1:size(n_reco,2)
 
     %% reshape the fid to match the fixed data structure and remove the zero
 
-    [ data_for_acqp ]   = remove_zero_from_fid( ex );
-    number_of_channels  = size(data_for_acqp,2);
-    number_of_lines     = size(data_for_acqp,3);
+    [ data_for_acqp ] = remove_zero_from_fid( ex );
 
-    %% gestion de la diffusion
+    number_of_channels=size(data_for_acqp,2);
+    number_of_lines=size(data_for_acqp,3);
 
-    % 
-    % data_tempo=reshape(data_for_acqp,[readout,number_of_channels , 10 ,E1 , E2 ]);
-    % 
-    % ex.method.PVM_EncSteps1(end)-ex.method.PVM_EncSteps1(1)
-    % 
-    % data_ok=zeros(size(data_tempo,1),size(data_tempo,2),size(data_tempo,3),nY,size(data_tempo,5));
-    % 
-    % data_ok(:,:,:,ex.method.PVM_EncSteps1(1)+round(nY/2):ex.method.PVM_EncSteps1(end)+round(nY/2),:)=data_tempo;
-    % 
-    % figure()
-    % imagesc(abs(squeeze(data_ok(:,1,1,:,75))))
-    % 
-    % data_reco=permute(data_ok, [1, 4, 5, 2,3]);
-    % 
-    % size(data_reco)
-    % 
-    % img_reco=ifft_3D(data_reco);
-    % 
-    % figure()
-    % for s=20:100
-    %     for d=1:10
-    % subplot(2,5,d); imagesc(abs(squeeze(img_reco(:,:,s,1,d))), [0 1]); colormap(gray);
-    % end
-    % pause(0.2)
-    % end
-    % 
-    % ex.acqp.ACQ_time_points
-    % ex.method.PVM_DwDir
-    % ex.method.PVM_DwNDiffExp
     %% fill the fixed data structure
 
     [ idx, flag ] = fill_the_idx( header , ex);
 
+    clear  check_indice
+
+    for i = 1:size(idx.kspace_encode_step_1,2)
+        if (idx.contrast(i)==0)
+            check_indice(idx.kspace_encode_step_1(i)+1,idx.kspace_encode_step_2(i)+1,1)=1;
+        end
+    end
+
+%     figure()
+%     subplot(2,1,1); imagesc(check_indice(:,:,1));
 
     %% parallel imaging option
 
@@ -154,6 +136,8 @@ for numb = 1:size(n_reco,2)
 
     % Loop over the acquisitions, set the header, set the data and append
 
+
+
     for acqno = 1:number_of_lines
 
         % Set the header elements that change from acquisition to the next
@@ -165,7 +149,7 @@ for numb = 1:size(n_reco,2)
         acqblock.head.idx.slice(acqno) = idx.slice(acqno);
         acqblock.head.idx.set(acqno) = idx.set(acqno);
         acqblock.head.idx.contrast(acqno) = idx.contrast(acqno);
-
+        acqblock.head.sample_time_us(acqno)=1/ex.acqp.SW_h*1e6;
 
         % Set the flags
         acqblock.head.flagClearAll(acqno);
@@ -175,7 +159,7 @@ for numb = 1:size(n_reco,2)
         if (acceleration_factor_y>1)
 
             if ismember(idx.kspace_encode_step_1(acqno),Ysamp_ACS-1)
-                %% attention si on met Ysamp_ACS sans le moins 1 la phase n'est pas bonne
+                %% attention si on mais Ysamp_ACS sans le moins 1 la phase n'est pas bonne
 
                 if ismember(idx.kspace_encode_step_1(acqno),Ysamp_regular)
                     % both calibration and part of the undersampled pattern
@@ -191,57 +175,61 @@ for numb = 1:size(n_reco,2)
 
         if (flag.first_in_encoding_step1(acqno)== 1)
             acqblock.head.flagSet('ACQ_FIRST_IN_ENCODE_STEP1', acqno);
-
         end
 
         if (flag.last_in_encoding_step1(acqno)== 1)
             acqblock.head.flagSet('ACQ_LAST_IN_ENCODE_STEP1', acqno);
-
         end
 
-         if (flag.first_in_contrast(acqno)== 1)
-            acqblock.head.flagSet('ACQ_FIRST_IN_CONTRAST', acqno);
-         end
-
-          if (flag.last_in_contrast(acqno)== 1)
-             acqblock.head.flagSet('ACQ_LAST_IN_CONTRAST', acqno);
-          end
-    %     
-    %     
-
-        %         acqblock.head.flagSet('ACQ_FIRST_IN_SLICE', acqno);
-        %         acqblock.head.flagSet('ACQ_FIRST_IN_REPETITION', acqno);
-        %     elseif acqno==size(K,2)
-        %         acqblock.head.flagSet('ACQ_LAST_IN_ENCODE_STEP1', acqno);
-        %         acqblock.head.flagSet('ACQ_LAST_IN_SLICE', acqno);
-        %         acqblock.head.flagSet('ACQ_LAST_IN_REPETITION', acqno);
-        %     end
-    end
-   
-%      % Apply the offsets
-         ch = size(data_for_acqp, 2);
-
-        Offcenter = phaseOffsetCorrection(ex);
-
-            data_for_acqp = permute(data_for_acqp,[3 1 2]);
-            tmp = data_for_acqp;
-        for ne=1:ex.method.PVM_NEchoImages
-             for k=1:ch
-                for jj=1:readout
-                        data_for_acqp(ne:ex.method.PVM_NEchoImages:end,jj,k)= tmp(ne:ex.method.PVM_NEchoImages:end,jj,k).*Offcenter(:,jj,:);
-                end
-             end
+        if (flag.first_in_encoding_step2(acqno)== 1)
+            acqblock.head.flagSet('ACQ_FIRST_IN_ENCODE_STEP2', acqno);
         end
-            data_for_acqp = permute(data_for_acqp,[2 3 1]);
-         
-            
-   for acqno = 1:number_of_lines         
-         acqblock.data{acqno} = squeeze(data_for_acqp(:,:,acqno));
-   end
+
+        if (flag.last_in_encoding_step2(acqno)== 1)
+            acqblock.head.flagSet('ACQ_LAST_IN_ENCODE_STEP2', acqno);
+        end
+
+        if (flag.first_in_repetition(acqno)== 1)
+            acqblock.head.flagSet('ACQ_FIRST_IN_REPETITION', acqno);
+        end
+
+        if (flag.last_in_repetition(acqno)== 1)
+            acqblock.head.flagSet('ACQ_LAST_IN_REPETITION', acqno);
+        end
+
+        if (flag.first_in_slice(acqno)== 1)
+            acqblock.head.flagSet('ACQ_FIRST_IN_SLICE', acqno);
+        end
+
+        if (flag.last_in_slice(acqno)== 1)
+            acqblock.head.flagSet('ACQ_LAST_IN_SLICE', acqno);
+        end
         
-% Append the acquisition block
+%         % Apply the offsets
+%          ch = size(data_for_acqp, 2);
+% 
+%         Offcenter = phaseOffsetCorrection(ex);
+% 
+%             data_for_acqp = permute(data_for_acqp,[3 1 2]);
+%             tmp = data_for_acqp;
+%         for ne=1:ex.method.PVM_NEchoImages
+%              for k=1:ch
+%                 for jj=1:readout
+%                         data_for_acqp(ne:ex.method.PVM_NEchoImages:end,jj,k)= tmp(ne:ex.method.PVM_NEchoImages:end,jj,k).*Offcenter(:,jj,:);
+%                 end
+%              end
+%         end
+%             data_for_acqp = permute(data_for_acqp,[2 3 1]);
+        
+        
+        % fill the data
+            acqblock.data{acqno} = squeeze(data_for_acqp(:,:,acqno));
+
+    end
+
+    % Append the acquisition block
     dset.appendAcquisition(acqblock);
-    
+
     %%%%%%%%%%%%%%%%%%%%%%%%
     %% Fill the xml header %
     %%%%%%%%%%%%%%%%%%%%%%%%
@@ -249,8 +237,7 @@ for numb = 1:size(n_reco,2)
     header.encoding.parallelImaging.accelerationFactor.kspace_encoding_step_1 = acceleration_factor_y ;
     header.encoding.parallelImaging.accelerationFactor.kspace_encoding_step_2 = 1 ;
     header.encoding.parallelImaging.calibrationMode = 'embedded' ;
-    header.sequenceParameters.TE = TE;
-    
+
     %% Serialize and write to the data set
     xmlstring = ismrmrd.xml.serialize(header);
     dset.writexml(xmlstring);

@@ -46,12 +46,10 @@ disp('--> GENERATE_NOISY_MULTICOILS_FLASH_SIMULATION');
         load('noise_covariances.mat');
 
         Rn_normal_7 = Rn_normal_8(1:ncoils,1:ncoils);
-        Rn_broken_7 = Rn_broken_8(1:ncoils,1:ncoils);
 
-        clear Rn_normal_8 Rn_broken_8
+        clear Rn_normal_8
 
         L_normal_7 = chol(Rn_normal_7,'lower');
-        L_broken_7 = chol(Rn_broken_7,'lower');
 
         %Some settings
         acc_factor = 1;
@@ -62,25 +60,27 @@ disp('--> GENERATE_NOISY_MULTICOILS_FLASH_SIMULATION');
 
             %Sample Cartesian Data
             noise_white = noise_level*complex(randn(size(img,1),size(img,2),size(smaps,3)),randn(size(img,1),size(img,2),size(smaps,3)));
-            noise_color = reshape(permute(L_broken_7 * permute(reshape(noise_white, numel(noise_white)/ncoils,ncoils),[2 1]),[2 1]),size(noise_white));
+            noise_color = reshape( permute( L_normal_7 * permute( reshape( noise_white, numel(noise_white)/ncoils,ncoils ),[2 1] ),[2 1] ), size(noise_white) );
 
             [data, sp] = ismrm_sample_data(img, smaps, acc_factor, 0);
             synData(:,:,:,i) = data + noise_color .* repmat(sp > 0,[1 1 ncoils]);
         end
+        
+        titles = cellstr(strcat('Coil',num2str([1:size(synData,3)]','%d')));
+        ismrm_imshow(abs(ifft_2D(squeeze(synData(:,:,:,1)))),[],[1 size(synData,3)],titles,'Synthetic MRI :: synData coils');
 
         %% Coils combination - Image reconstruction
         disp('--> DIXON_COIL_COMBINE');
             disp('    :: Walsh reconstruction');
 
                 % Number of echoes
-                %nechoes = 3;
-                nechoes = size(TE,2);
+                nechoes = size(TE,1);
                 im = Dixon_coil_combine(synData, nechoes, 'h5');
                 im = permute(im, [1 2 4 3]);
                 
-                titles = cellstr(strcat('TE = ',num2str(TE','%-.2f'), ' ms'));
-                ismrm_imshow(abs(im),[],[1 size(im,3)],titles);
-                ismrm_imshow(angle(im),[],[1 size(im,3)],titles);
+                titles = cellstr(strcat('TE = ',num2str(TE,'%-.2f'), ' ms'));
+                ismrm_imshow(abs(im),[],[1 size(im,3)],titles,'Synthetic MRI :: Magnitude');
+                ismrm_imshow(angle(im),[],[1 size(im,3)],titles,'Synthetic MRI :: Phase');
         disp('<-- DIXON_COIL_COMBINE');
 
         %% 3 points Dixon reconstruction
@@ -92,10 +92,10 @@ disp('--> GENERATE_NOISY_MULTICOILS_FLASH_SIMULATION');
             clear Dixon
                  Dixon(:,:,1) = W;
                  Dixon(:,:,2) = F;
-                 ismrm_imshow(abs(Dixon),[],[1 2],{'Water' 'Fat'});
+                 ismrm_imshow(abs(Dixon),[],[1 2],{'Water' 'Fat'}, 'Synthetic MRI :: Dixon');
         disp('<-- DIXON_3P');
         
         %% Save data
-        clear acc_factor ans data i id img L_normal_7 L_broken_7 ne noise_color noise_white Rn_broken_7 Rn_normal_7 s S0_F S0_W x y z
+%         clear acc_factor ans data i id img L_normal_7 ne noise_color noise_white Rn_normal_7 s S0_F S0_W x y z
        % save('Synthetic.mat');
 disp('<-- GENERATE_NOISY_MULTICOILS_FLASH_SIMULATION');
