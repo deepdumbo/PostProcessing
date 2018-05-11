@@ -27,7 +27,7 @@ function [unwr, mask] = Masked_Unwrap(S0, S2_, Debug)
 %     
 %     % N.B. : Trouver un moyen de faire ça automatiquement
 %     mask = er2;
-      tresh = 0.1;
+      tresh = 0.05;
       idx = m1 > tresh*max(m1(:));
       mask = 0.*m1;
       mask(idx) = 1;

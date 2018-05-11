@@ -1,12 +1,6 @@
 function [kspace_data, output_tmp, TE] = hdf5_kspace_reader(path, files)
 
-    [status,id]= system('whoami');
-
-    str_user= id(1:end-1);
-
-    check_if_iam_using_the_ihuserver(str_user);
-
-    [ str_network_imagerie, str_network_perso ] = get_network_name( str_user );
+    str_user        = get_PC_name();
     
     fprintf('\t Number of echoes : %d \n', size(files, 2));
 
@@ -116,6 +110,7 @@ function [kspace_data, output_tmp, TE] = hdf5_kspace_reader(path, files)
 
         kspace_data(:,:,:,:,ne)   = mat.kspace.raw;
         TE(ne)                  = hdr.sequenceParameters.TE;
+%         TE(ne) = 2.8 + 0.35*(ne-1);
 
     end
 

@@ -1,13 +1,14 @@
 %% Read Bruker File
 
-clear all
+%clear all
 %close all
 
 
 
 [status,id]= system('whoami');
 
-str_user= id(1:end-1);
+% str_user= id(1:end-1);
+str_user = get_PC_name();
 
 check_if_iam_using_the_ihuserver(str_user);
 
@@ -42,19 +43,19 @@ check_if_iam_using_the_ihuserver(str_user);
 
 %% Boucle reco
 
-n_reco = [5:35];
+n_reco = [14];
 
 for numb = 1:size(n_reco,2)
         % acquisition_path=['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20171221/Dixon/24'];
         % output_tmp = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20171221/Dixon/24'];
         %  acquisition_path=['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20171221/Dixon/13'];
         %  output_tmp = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20171221/Dixon/13'];
-%         acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Ex_Vivo/2D/No_Grappa/20180216/',num2str(n_reco(numb))];
-%         output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/Ex_Vivo/2D/No_Grappa/20180216/',num2str(n_reco(numb))];
-    %     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20180227/',num2str(n_reco(numb))];
-    %     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20180227/',num2str(n_reco(numb))];
-          acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Verification/Ex_Vivo/2D/20180326_Unmasc/',num2str(n_reco(numb))];
-          output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Verification/Ex_Vivo/2D/20180326_Unmasc/',num2str(n_reco(numb))];
+        acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Verification/Ex_Vivo/2D/20180319/',num2str(n_reco(numb))];
+        output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Verification/RecoData/Ex_Vivo/2D/No_Grappa/20180319/',num2str(n_reco(numb))];
+%         acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/In_Vitro/2D/No_Grappa/20180227/',num2str(n_reco(numb))];
+%         output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Validation/RecoData/In_Vitro/2D/No_Grappa/20180227/',num2str(n_reco(numb))];
+%           acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Verification/Ex_Vivo/2D/20180326_Unmasc/',num2str(n_reco(numb))];
+%           output_tmp          = ['/home/', str_user, '/Dicom/DIXON/Verification/Ex_Vivo/2D/20180326_Unmasc/',num2str(n_reco(numb))];
     %     acquisition_path    = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Validation/RawData/Dixon_t2star/Vitro/',num2str(n_reco(numb))];
     %     output_tmp          = ['/home/', str_user, '/Dicom/DIXON/',num2str(n_reco(numb))];
 

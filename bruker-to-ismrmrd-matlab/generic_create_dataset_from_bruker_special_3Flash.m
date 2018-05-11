@@ -5,7 +5,8 @@ close all
 
 [status,id]= system('whoami');
 
-str_user= id(1:end-1);
+% str_user= id(1:end-1);
+str_user = get_PC_name();
 
 check_if_iam_using_the_ihuserver(str_user);
 
@@ -58,13 +59,13 @@ check_if_iam_using_the_ihuserver(str_user);
 
 % acquisition_path='/home/valery/Reseau/Imagerie/For_Kylian/Test_comp_DixonVARPRO/29/'
 
-numb = [5:35];
+numb = [9:11];
 
 for i=numb(1):2:numb(end-2)
-    acquisition_path_1 = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Verification/Ex_Vivo/2D/20180326_Unmasc/', num2str(i)];
-    acquisition_path_2 = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Verification/Ex_Vivo/2D/20180326_Unmasc/', num2str(i+1)];
-    acquisition_path_3 = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Verification/Ex_Vivo/2D/20180326_Unmasc/', num2str(i+2)];
-    output_filename    = ['/home/', str_user, '/Dicom/DIXON/Verification/Ex_Vivo/2D/20180326_Unmasc/',num2str(i),'_',num2str(i+2),'.h5'];
+    acquisition_path_1 = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Verification/Ex_Vivo/2D/20180412_Unmasc/', num2str(i)];
+    acquisition_path_2 = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Verification/Ex_Vivo/2D/20180412_Unmasc/', num2str(i+1)];
+    acquisition_path_3 = ['/home/', str_user, '/mount/Imagerie/For_Kylian/Dixon/Verification/Ex_Vivo/2D/20180412_Unmasc/', num2str(i+2)];
+    output_filename    = ['/home/', str_user, '/Dicom/DIXON/Verification/Ex_Vivo/2D/20180412_Unmasc/',num2str(i),'_',num2str(i+2),'.h5'];
 
 
     %% reading bruker acqp, method and fid files.

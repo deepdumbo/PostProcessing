@@ -6,11 +6,11 @@ clear all
     [ str_network_imagerie, str_network_perso ] = get_network_name( str_user );
 
     % Select the source folder
-    patient{1}.folderRaw    = ['/home/',str_user,'/mount/Imagerie/For_Kylian/Dixon/Verification/Ex_Vivo/2D/20180326_Unmasc/' ];
+    patient{1}.folderRaw    = ['/home/',str_user,'/mount/Imagerie/For_Kylian/Dixon/Verification/Ex_Vivo/2D/20180412_Unmasc/' ];
     %patient{2}.folderRaw   = ['/home/',str_user,str_network_imagerie,'DICOM_DATA/2018-03-13_ICM/HIFU_PRECLINIC_18_03_13-11_55_55/' ];
     
     % Select the output folder
-    patient{1}.folderOutput = ['/home/',str_user,'/Dicom/DIXON/Verification/Ex_Vivo/2D/20180326_Unmasc/'];
+    patient{1}.folderOutput = ['/home/',str_user,'/mount/Imagerie/For_Kylian/Dixon/Verification/Ex_Vivo/2D/20180412_Unmasc/'];
     %patient{2}.folderOutput= ['/home/',str_user,str_network_perso,'MatlabUnix/2018-03-13_ARFI/'];
     
     % Select the file name
@@ -29,7 +29,7 @@ clear all
         real_listing    = listing(3:end); % Starts at 3 to avoid '.' and '..' files
 
         % Display the selected files        
-        fprintf(' From : %s \n\t- Size : %d file(s)\n', folderRaw, size(folderRaw,2));
+        fprintf(' From : %s \n\t- Size : %d file(s)\n', folderRaw, size(real_listing,1));
         
         % Define the output file
         monFichier      = [folderOutput, filenameOutput, '.txt'];

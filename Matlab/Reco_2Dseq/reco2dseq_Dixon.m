@@ -1,4 +1,4 @@
-function [im, rawData]=reco2dseq(acquisition_path, pdata_file, RecoMode)
+function [im, rawData, paramStructure]=reco2dseq_Dixon(acquisition_path, pdata_file, RecoMode)
 
 [paramStructure]=readParams_Bruker('dirPath',acquisition_path);
 
@@ -19,7 +19,6 @@ function [im, rawData]=reco2dseq(acquisition_path, pdata_file, RecoMode)
         nCoils = 7;
     end
     
-im= reshape(rawData,paramStructure.PVM_Matrix(1),paramStructure.PVM_Matrix(2),paramStructure.PVM_Matrix(3), nCoils, []);
-size(im)
+im = reshape(rawData,paramStructure.PVM_Matrix(1),paramStructure.PVM_Matrix(2),paramStructure.PVM_Matrix(3),paramStructure.ACQ_n_echo_images, nCoils, []);
     
 end

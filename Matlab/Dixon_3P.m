@@ -16,7 +16,7 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, TE)
 
 %% Check arguments
     narginchk( 4, nargin('Dixon_3P') ); 
-    Debug = 1;
+    Debug = 0;
     
 %% We have basically 6 equations (3 magnitude and 3 phase) with a 7th that 
 %  constraints the others. And 5 unknowns (W, F, phi0, phi and A):
@@ -106,7 +106,7 @@ function [ W, F ] = Dixon_3P( S0, S1, S2, TE)
     end
     
     if(Debug)
-        curr = 140;
+        curr = size(hc,1)/2;
         figure('Name','Plot comp'); 
         plot(phi_2(curr,:),'b'); 
         hold on; plot(phi(curr,:),'k-');

@@ -1,7 +1,7 @@
 %% Parameters initialization
     PVM.GradCalCons = 1000.0; % Max Grad Strenght (T/m)
 
-    PVM.Gyro        = 42.577; % Gyromagnetic ratio for water (MHz/T)
+    PVM.Gyro        = 42.5774; % Gyromagnetic ratio for water (MHz/T)
     PVM.ChemShift   = 3.57;   % Chemical Shift (ppm)
     PVM.B0          = 400.313032222786; % MHz
 
